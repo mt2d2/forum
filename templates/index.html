@@ -1,0 +1,19 @@
+{{template "header.html"}}
+		<table>
+			<tr>
+				<td>id</td>
+				<td>Title</td>
+				<td>Description</td>
+				<td>Topics</td>
+			</tr>
+
+			{{range $f := .}}
+			<tr>
+				<td>{{$f.Id}}</td>
+				<td><a href="forum/{{$f.Id}}">{{$f.Title}}</a></td>
+				<td>{{$f.Description}}</td>
+				<td>{{$f.TopicCount}}</td>
+			</tr>
+			{{end}}
+		</table>
+{{template "footer.html"}}

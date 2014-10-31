@@ -1,0 +1,29 @@
+{{template "header.html"}}
+		<h1>{{.topic.Title}}: {{.topic.Description}}</h1>	
+		
+		<h2>Posts</h2>
+
+		<div>
+			<a href="/topic/{{.topic.Id}}/add">Add Post</a>
+		</div>
+
+		<table>
+			<tr>
+				<td>id</td>
+				<td>Date</td>
+				<td>Text</td>
+			</tr>
+
+			{{range $p := .posts}}
+			<tr>
+				<td>{{$p.Id}}</td>
+				<td>{{$p.Published}}</td>
+				<td>{{$p.Text}}</td>
+			</tr>
+			{{end}}
+		</table>
+
+		<div>
+			<a href="/topic/{{.topic.Id}}/add">Add Post</a>
+		</div>
+{{template "footer.html"}}

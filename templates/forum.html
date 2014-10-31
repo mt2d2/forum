@@ -1,0 +1,23 @@
+{{template "header.html"}}
+		<h1>{{.forum.Title}}: {{.forum.Description}}</h1>	
+		
+		<h2>Topics</h2>
+
+		<table>
+			<tr>
+				<td>id</td>
+				<td>Title</td>
+				<td>Description</td>
+				<td>Posts</td>
+			</tr>
+
+			{{range $t := .topics}}
+			<tr>
+				<td>{{$t.Id}}</td>
+				<td><a href="/topic/{{$t.Id}}">{{$t.Title}}</a></td>
+				<td>{{$t.Description}}</td>
+				<td>{{$t.PostCount}}</td>
+			</tr>
+			{{end}}
+		</table>
+{{template "footer.html"}}
