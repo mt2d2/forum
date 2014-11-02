@@ -34,6 +34,7 @@ func newApp() *App {
 		"templates/forum.html",
 		"templates/topic.html",
 		"templates/addPost.html",
+		"templates/addTopic.html",
 	)), db}
 }
 
@@ -99,6 +100,33 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 	app.renderTemplate(w, "topic", results)
 }
 
+func (app *App) handleAddTopic(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	id := vars["id"]
+
+	results := make(map[string]interface{})
+	results["ForumId"] = id
+	app.renderTemplate(w, "addTopic", results)
+}
+
+func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	topic := model.NewTopic()
+    decoder := schema.NewDecoder()
+    err := decoder.Decode(topic, req.PostForm)
+    if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+
+	err = model.SaveTopic(app.db, topic)
+    if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+
+	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId"), 302)
+}
+
 func (app *App) handleAddPost(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
@@ -152,6 +180,8 @@ func main() {
 
 	f := r.PathPrefix("/forum").Subrouter()
 	f.HandleFunc("/{id:[0-9]+}", app.handleForum)
+	f.HandleFunc("/{id:[0-9]+}/add", app.handleAddTopic).Methods("GET")
+	f.HandleFunc("/{id:[0-9]+}/add", app.handleSaveTopic).Methods("POST")
 
 	t := r.PathPrefix("/topic").Subrouter()
 	t.HandleFunc("/{id:[0-9]+}", app.handleTopic)

@@ -3,6 +3,8 @@
 		
 		<h2>Topics</h2>
 
+		<div><a href="/forum/{{.forum.Id}}/add">Add topic</a></div>
+
 		<table>
 			<tr>
 				<td>id</td>
@@ -20,4 +22,6 @@
 			</tr>
 			{{end}}
 		</table>
+
+		<div><a href="/forum/{{.forum.Id}}/add">Add topic</a></div>
 {{template "footer.html"}}

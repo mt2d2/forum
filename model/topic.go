@@ -12,6 +12,15 @@ type Topic struct {
 	PostCount   int
 }
 
+func NewTopic() *Topic {
+	return &Topic{-1, "", "", -1, -1}
+}
+
+func SaveTopic(db *sql.DB, topic *Topic) error {
+	_, err := db.Exec("INSERT INTO topics (id, title, description, forum_id) VALUES (NULL,?,?,?)", topic.Title, topic.Description, topic.ForumId)
+	return err
+}
+
 func FindOneTopic(db *sql.DB, reqId string) (Topic, error) {
 	var (
 		id          int
