@@ -7,6 +7,7 @@ import "os"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
 
+import "github.com/daaku/go.httpgzip"
 import "github.com/gorilla/mux"
 import "github.com/gorilla/Schema"
 
@@ -188,7 +189,7 @@ func main() {
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleAddPost).Methods("GET")
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleSavePost).Methods("POST")
 
-	http.Handle("/", r)
+	http.Handle("/", httpgzip.NewHandler(r))
 	http.ListenAndServe(":8080", nil)
 
 	app.destroy()
