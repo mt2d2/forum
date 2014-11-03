@@ -1,4 +1,4 @@
-{{template "header.html"}}
+{{template "header.html" .}}
 		<h1>{{.topic.Title}}: {{.topic.Description}}</h1>	
 		
 		<h2>Posts</h2>
@@ -26,4 +26,4 @@
 		<div>
 			<a href="/topic/{{.topic.Id}}/add">Add Post</a>
 		</div>
-{{template "footer.html"}}
+{{template "footer.html" .}}

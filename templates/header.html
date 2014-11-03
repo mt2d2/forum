@@ -5,3 +5,13 @@
 	</head>
 	<body>
 	<h1><a href="/">Forum</a></h1>
+
+	{{if .flashes}}
+	<div id="flash">
+		<ul>
+		{{range $f := .flashes}}
+			<li>{{$f}}</li>
+		{{end}}
+		</ul>
+	</div>
+	{{end}}

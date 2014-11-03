@@ -1,7 +1,7 @@
-{{template "header.html"}}
+{{template "header.html" .}}
 		<form method="post">
 			<textarea name="Text"></textarea>
 			<input type="hidden" name="TopicId" value="{{.TopicId}}" />
 			<input type="submit" value="Add post" />
 		</form>
-{{template "footer.html"}}
+{{template "footer.html" .}}

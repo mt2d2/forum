@@ -1,4 +1,4 @@
-{{template "header.html"}}
+{{template "header.html" .}}
 		<table>
 			<tr>
 				<td>id</td>
@@ -7,7 +7,7 @@
 				<td>Topics</td>
 			</tr>
 
-			{{range $f := .}}
+			{{range $f := .forums}}
 			<tr>
 				<td>{{$f.Id}}</td>
 				<td><a href="forum/{{$f.Id}}">{{$f.Title}}</a></td>
@@ -16,4 +16,4 @@
 			</tr>
 			{{end}}
 		</table>
-{{template "footer.html"}}
+{{template "footer.html" .}}

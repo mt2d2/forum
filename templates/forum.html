@@ -1,4 +1,4 @@
-{{template "header.html"}}
+{{template "header.html" .}}
 		<h1>{{.forum.Title}}: {{.forum.Description}}</h1>	
 		
 		<h2>Topics</h2>
@@ -24,4 +24,4 @@
 		</table>
 
 		<div><a href="/forum/{{.forum.Id}}/add">Add topic</a></div>
-{{template "footer.html"}}
+{{template "footer.html" .}}

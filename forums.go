@@ -7,9 +7,14 @@ import "os"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
 
+
+import "fmt"
+
 import "github.com/daaku/go.httpgzip"
 import "github.com/gorilla/mux"
 import "github.com/gorilla/Schema"
+import "github.com/gorilla/securecookie"
+import "github.com/gorilla/sessions"
 
 import "forums/model"
 
@@ -20,6 +25,7 @@ const (
 type App struct {
 	templates *template.Template
 	db        *sql.DB
+	sessions  *sessions.CookieStore
 }
 
 func newApp() *App {
@@ -28,7 +34,7 @@ func newApp() *App {
 		panic("error opening database")
 	}
 
-	return &App{template.Must(template.ParseFiles(
+	templates := template.Must(template.ParseFiles(
 		"templates/header.html",
 		"templates/footer.html",
 		"templates/index.html",
@@ -36,14 +42,23 @@ func newApp() *App {
 		"templates/topic.html",
 		"templates/addPost.html",
 		"templates/addTopic.html",
-	)), db}
+	))
+
+	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(256))
+
+	return &App{templates, db, sessionStore}
 }
 
 func (app *App) destroy() {
 	app.db.Close()
 }
 
-func (app *App) renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
+    session, _ := app.sessions.Get(r, "forumSession")
+    data["flashes"] = session.Flashes()
+    fmt.Printf("flashes size: %d\n", len(data["flashes"].([]interface{})))
+    session.Save(r, w)
+
 	err := app.templates.ExecuteTemplate(w, tmpl+".html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -56,7 +71,10 @@ func (app *App) handleIndex(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	app.renderTemplate(w, "index", forums)
+	results := make(map[string]interface{})
+	results["forums"] = forums
+
+	app.renderTemplate(w, req, "index", results)
 }
 
 func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
@@ -77,7 +95,7 @@ func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 	results["forum"] = forum
 	results["topics"] = topics
 
-	app.renderTemplate(w, "forum", results)
+	app.renderTemplate(w, req, "forum", results)
 }
 
 func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
@@ -98,7 +116,7 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 	results["topic"] = topic
 	results["posts"] = posts
 
-	app.renderTemplate(w, "topic", results)
+	app.renderTemplate(w, req, "topic", results)
 }
 
 func (app *App) handleAddTopic(w http.ResponseWriter, req *http.Request) {
@@ -107,7 +125,7 @@ func (app *App) handleAddTopic(w http.ResponseWriter, req *http.Request) {
 
 	results := make(map[string]interface{})
 	results["ForumId"] = id
-	app.renderTemplate(w, "addTopic", results)
+	app.renderTemplate(w, req, "addTopic", results)
 }
 
 func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
@@ -134,7 +152,7 @@ func (app *App) handleAddPost(w http.ResponseWriter, req *http.Request) {
 
 	results := make(map[string]interface{})
 	results["TopicId"] = id
-	app.renderTemplate(w, "addPost", results)
+	app.renderTemplate(w, req, "addPost", results)
 }
 
 func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
@@ -151,6 +169,10 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
     if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
     }
+
+    session, _ := app.sessions.Get(req, "forumSession")
+    session.AddFlash("You added a post!")
+    session.Save(req, w)
 
 	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId"), 302)
 }

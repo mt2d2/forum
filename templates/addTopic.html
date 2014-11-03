@@ -1,4 +1,4 @@
-{{template "header.html"}}
+{{template "header.html" .}}
 		<form method="post">
 			<label for="Title">Title</label>
 			<input type="text" name="Title" />
@@ -7,4 +7,4 @@
 			<input type="hidden" name="ForumId" value="{{.ForumId}}" />
 			<input type="submit" value="Add topic" />
 		</form>
-{{template "footer.html"}}
+{{template "footer.html" .}}
