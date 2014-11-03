@@ -7,9 +7,6 @@ import "os"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
 
-
-import "fmt"
-
 import "github.com/daaku/go.httpgzip"
 import "github.com/gorilla/mux"
 import "github.com/gorilla/Schema"
@@ -56,7 +53,6 @@ func (app *App) destroy() {
 func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
     session, _ := app.sessions.Get(r, "forumSession")
     data["flashes"] = session.Flashes()
-    fmt.Printf("flashes size: %d\n", len(data["flashes"].([]interface{})))
     session.Save(r, w)
 
 	err := app.templates.ExecuteTemplate(w, tmpl+".html", data)
