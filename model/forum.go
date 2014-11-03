@@ -30,7 +30,7 @@ func FindOneForum(db *sql.DB, reqId string) (Forum, error) {
 func topicCount(db *sql.DB, reqId string) (int, error) {
 	var count int
 
-	row := db.QueryRow("SELECT count(*) FROM forums WHERE id = ?", reqId)
+	row := db.QueryRow("SELECT count(*) FROM topics WHERE forum_id = ?", reqId)
 	err := row.Scan(&count)
 	if err != nil {
 		return 0, err
