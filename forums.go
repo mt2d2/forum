@@ -50,6 +50,12 @@ func (app *App) destroy() {
 	app.db.Close()
 }
 
+func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error string) {
+    session, _ := app.sessions.Get(r, "forumSession")
+    session.AddFlash(error)
+    session.Save(r, w)
+}
+
 func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
     session, _ := app.sessions.Get(r, "forumSession")
     data["flashes"] = session.Flashes()
