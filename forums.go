@@ -50,6 +50,12 @@ func (app *App) destroy() {
 	app.db.Close()
 }
 
+func (app *App) addErrorFlashes(w http.ResponseWriter, r *http.Request, errs []error) {
+	for _, err := range errs {
+		app.addErrorFlash(w, r, err.Error())
+	}
+}
+
 func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error string) {
     session, _ := app.sessions.Get(r, "forumSession")
     session.AddFlash(error)
@@ -64,6 +70,7 @@ func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl stri
 	err := app.templates.ExecuteTemplate(w, tmpl+".html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -71,6 +78,7 @@ func (app *App) handleIndex(w http.ResponseWriter, req *http.Request) {
 	forums, err := model.FindForums(app.db)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	results := make(map[string]interface{})
@@ -91,6 +99,7 @@ func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 	topics, err := model.FindTopics(app.db, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	results := make(map[string]interface{})
@@ -107,11 +116,13 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 	topic, err := model.FindOneTopic(app.db, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	posts, err := model.FindPosts(app.db, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	results := make(map[string]interface{})
@@ -138,6 +149,7 @@ func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
     err := decoder.Decode(topic, req.PostForm)
     if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
     }
 
 	err = model.SaveTopic(app.db, topic)
@@ -165,16 +177,21 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
     err := decoder.Decode(post, req.PostForm)
     if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+    }
+
+    ok, errors := model.ValidatePost(post)
+    if !ok {
+    	app.addErrorFlashes(w, req, errors)
+    	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId") + "/add", 302)
+    	return
     }
 
 	err = model.SavePost(app.db, post)
     if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
     }
-
-    session, _ := app.sessions.Get(req, "forumSession")
-    session.AddFlash("You added a post!")
-    session.Save(req, w)
 
 	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId"), 302)
 }

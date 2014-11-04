@@ -3,6 +3,7 @@ package model
 import "errors"
 import "database/sql"
 import "time"
+import "strings"
 
 type Post struct {
 	Id        int
@@ -15,12 +16,19 @@ func NewPost() *Post {
 	return &Post{-1, "", time.Now().UTC(), -1}
 }
 
-func ValidatePost(post *Post) (ok bool, []errors errs) {
-	ok = true
-	errs = nil
+func ValidatePost(post *Post) (ok bool, errs []error) {
+	errs = make([]error, 0)
 
+	if strings.TrimSpace(post.Text) == "" {
+		errs = append(errs, errors.New("Post must have some text."))
+	}
 
-	return
+	// check for valid topic id with database query
+	if post.TopicId == -1 {
+		errs = append(errs, errors.New("Post must belong to a valid topic."))
+	}
+
+	return len(errs) == 0, errs
 }
 
 func SavePost(db *sql.DB, post *Post) error {
