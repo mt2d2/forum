@@ -15,6 +15,14 @@ func NewPost() *Post {
 	return &Post{-1, "", time.Now().UTC(), -1}
 }
 
+func ValidatePost(post *Post) (ok bool, []errors errs) {
+	ok = true
+	errs = nil
+
+
+	return
+}
+
 func SavePost(db *sql.DB, post *Post) error {
 	_, err := db.Exec("INSERT INTO posts (id, text, published, topic_id) VALUES (NULL,?,?,?)", post.Text, post.Published, post.TopicId)
 	return err
