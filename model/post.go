@@ -23,7 +23,7 @@ func ValidatePost(post *Post) (ok bool, errs []error) {
 		errs = append(errs, errors.New("Post must have some text."))
 	}
 
-	// check for valid topic id with database query
+	// todo, check for valid topic id with database query
 	if post.TopicId == -1 {
 		errs = append(errs, errors.New("Post must belong to a valid topic."))
 	}

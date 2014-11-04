@@ -152,6 +152,13 @@ func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
 		return
     }
 
+    ok, errors := model.ValidateTopic(topic)
+    if !ok {
+    	app.addErrorFlashes(w, req, errors)
+    	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId") + "/add", 302)
+    	return
+    }
+
 	err = model.SaveTopic(app.db, topic)
     if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

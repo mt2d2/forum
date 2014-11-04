@@ -3,6 +3,7 @@ package model
 import "errors"
 import "database/sql"
 import "strconv"
+import "strings"
 
 type Topic struct {
 	Id          int
@@ -14,6 +15,32 @@ type Topic struct {
 
 func NewTopic() *Topic {
 	return &Topic{-1, "", "", -1, -1}
+}
+
+func ValidateTopic(topic *Topic) (ok bool, errs []error) {
+	errs = make([]error, 0)
+
+	trimmedTitle := strings.TrimSpace(topic.Title)
+	trimmedDescription := strings.TrimSpace(topic.Description)
+
+	if trimmedTitle == "" {
+		errs = append(errs, errors.New("Topic must have a title."))
+	}
+
+	if len(trimmedTitle) > 255 {
+		errs = append(errs, errors.New("Topic title is too long."))
+	}
+
+	if len(trimmedDescription) > 255 {
+		errs = append(errs, errors.New("Topic description is too long."))
+	}
+
+	// todo, check for valid forum id with database query
+	if topic.ForumId == -1 {
+		errs = append(errs, errors.New("Post must belong to a valid topic."))
+	}
+
+	return len(errs) == 0, errs
 }
 
 func SaveTopic(db *sql.DB, topic *Topic) error {
