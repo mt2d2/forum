@@ -1,5 +1,6 @@
 package main
 
+import "errors"
 import "html/template"
 import "io"
 import "net/http"
@@ -40,6 +41,7 @@ func newApp() *App {
 		"templates/addPost.html",
 		"templates/addTopic.html",
 		"templates/register.html",
+		"templates/login.html",
 	))
 
 	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64))
@@ -65,7 +67,16 @@ func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error erro
 
 func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
     session, _ := app.sessions.Get(r, "forumSession")
+    
     data["flashes"] = session.Flashes()
+
+    if userId, ok := session.Values["user_id"].(int); ok {
+	    user, err := model.FindOneUserById(app.db, userId)
+		if err == nil {
+	    	data["user"] = user
+	    }
+    }
+
     session.Save(r, w)
 
 	err := app.templates.ExecuteTemplate(w, tmpl+".html", data)
@@ -242,6 +253,54 @@ func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
     http.Redirect(w, req, "/", 302)
 }
 
+func (app *App) handleLogin(w http.ResponseWriter, req *http.Request) {
+	results := make(map[string]interface{})
+	app.renderTemplate(w, req, "login", results)
+}
+
+func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	username := req.PostFormValue("Username")
+	password := []byte(req.PostFormValue("Password"))
+
+	if username == "" || len(password) == 0 {
+		app.addErrorFlash(w, req, errors.New("Enter a username and password."))
+		http.Redirect(w, req, "/user/login", 302)
+		return
+	}
+
+	invalidUserOrPassword := errors.New("Invalid username or password.")
+
+	user, err := model.FindOneUser(app.db, username)
+	if err != nil {
+		app.addErrorFlash(w, req, invalidUserOrPassword)
+		http.Redirect(w, req, "/user/login", 302)
+		return
+	}
+
+	err = user.CompareHashAndPassword(&password)
+	if err != nil {
+		app.addErrorFlash(w, req, invalidUserOrPassword)
+		http.Redirect(w, req, "/user/login", 302)
+		return
+	}
+
+    session, _ := app.sessions.Get(req, "forumSession")
+    session.Values["user_id"] = user.Id
+    session.Save(req, w)
+
+	http.Redirect(w, req, "/", 302)
+}
+
+func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
+    session, _ := app.sessions.Get(req, "forumSession")
+    delete(session.Values, "user_id")
+    session.Save(req, w)
+
+    http.Redirect(w, req, "/", 302)
+}
+
 func backup() {
 	src, err := os.Open(DATABASE_FILE)
 	defer src.Close()
@@ -279,6 +338,9 @@ func main() {
 	u := r.PathPrefix("/user").Subrouter()
 	u.HandleFunc("/add", app.handleRegister).Methods("GET")
 	u.HandleFunc("/add", app.saveRegister).Methods("POST")
+	u.HandleFunc("/login", app.handleLogin).Methods("GET")
+	u.HandleFunc("/login", app.saveLogin).Methods("POST")
+	u.HandleFunc("/logout", app.handleLogout)
 
 	http.Handle("/", httpgzip.NewHandler(r))
 	http.ListenAndServe(":8080", nil)

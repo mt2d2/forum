@@ -6,6 +6,14 @@
 	<body>
 	<h1><a href="/">Forum</a></h1>
 
+	<div id="header">
+		{{if .user}}
+		Logged in: {{.user.Username}} <a href="/user/logout">Logout</a>
+		{{else}}
+		 <a href="/user/login">Login</a> <a href="/user/add">Register</a>
+		{{end}}
+	</div>
+
 	{{if .flashes}}
 	<div id="flash">
 		<ul>
