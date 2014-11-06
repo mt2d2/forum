@@ -39,9 +39,10 @@ func newApp() *App {
 		"templates/topic.html",
 		"templates/addPost.html",
 		"templates/addTopic.html",
+		"templates/register.html",
 	))
 
-	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(256))
+	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64))
 
 	return &App{templates, db, sessionStore}
 }
@@ -52,13 +53,13 @@ func (app *App) destroy() {
 
 func (app *App) addErrorFlashes(w http.ResponseWriter, r *http.Request, errs []error) {
 	for _, err := range errs {
-		app.addErrorFlash(w, r, err.Error())
+		app.addErrorFlash(w, r, err)
 	}
 }
 
-func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error string) {
+func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error error) {
     session, _ := app.sessions.Get(r, "forumSession")
-    session.AddFlash(error)
+    session.AddFlash(error.Error())
     session.Save(r, w)
 }
 
@@ -203,6 +204,44 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId"), 302)
 }
 
+func (app *App) handleRegister(w http.ResponseWriter, req *http.Request) {
+	results := make(map[string]interface{})
+	app.renderTemplate(w, req, "register", results)
+}
+
+func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	user := model.NewUser()
+    // manually grab password so we can convert to byte
+    user.Username = req.PostFormValue("Username")
+    user.Email = req.PostFormValue("Email")
+    user.Password = []byte(req.PostFormValue("Password"))
+
+    ok, errors := model.ValidateUser(user)
+    if !ok {
+    	app.addErrorFlashes(w, req, errors)
+    	http.Redirect(w, req, "/user/add", 302)
+    	return
+    }
+
+    err := user.HashPassword()
+    if err != nil {
+    	app.addErrorFlash(w, req, err)
+    	http.Redirect(w, req, "/user/add", 302)
+    	return
+    }
+
+    err = model.SaveUser(app.db, user)
+	if err != nil {
+    	app.addErrorFlash(w, req, err)
+    	http.Redirect(w, req, "/user/add", 302)
+    	return
+    }
+
+    http.Redirect(w, req, "/", 302)
+}
+
 func backup() {
 	src, err := os.Open(DATABASE_FILE)
 	defer src.Close()
@@ -236,6 +275,10 @@ func main() {
 	t.HandleFunc("/{id:[0-9]+}", app.handleTopic)
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleAddPost).Methods("GET")
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleSavePost).Methods("POST")
+
+	u := r.PathPrefix("/user").Subrouter()
+	u.HandleFunc("/add", app.handleRegister).Methods("GET")
+	u.HandleFunc("/add", app.saveRegister).Methods("POST")
 
 	http.Handle("/", httpgzip.NewHandler(r))
 	http.ListenAndServe(":8080", nil)
