@@ -10,10 +10,12 @@ type Post struct {
 	Text      string
 	Published time.Time
 	TopicId   int
+	UserId    int
+	User      *User
 }
 
 func NewPost() *Post {
-	return &Post{-1, "", time.Now().UTC(), -1}
+	return &Post{-1, "", time.Now().UTC(), -1, -1,nil}
 }
 
 func ValidatePost(post *Post) (ok bool, errs []error) {
@@ -37,7 +39,7 @@ func SavePost(db *sql.DB, post *Post) error {
 }
 
 func FindPosts(db *sql.DB, reqId string) ([]Post, error) {
-	rows, err := db.Query("SELECT * FROM posts WHERE topic_id=? ORDER BY datetime(published) ASC", reqId)
+	rows, err := db.Query("SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.id WHERE topic_id=? ORDER BY datetime(published) ASC", reqId)
 	defer rows.Close()
 	if err != nil {
 		return nil, errors.New("could not query for posts for topic " + reqId)
@@ -50,14 +52,17 @@ func FindPosts(db *sql.DB, reqId string) ([]Post, error) {
 			text      string
 			published time.Time
 			topicId   int
+			userId    int
+			username  string
 		)
 
-		err := rows.Scan(&id, &text, &published, &topicId)
+		err := rows.Scan(&id, &text, &published, &topicId, &userId, &username)
 		if err != nil {
 			return nil, err
 		}
 
-		posts = append(posts, Post{id, text, published, topicId})
+		posts = append(posts, Post{id, text, published, topicId, userId, 
+						&User{-1, username, "", []byte{}, []byte{}}})
 	}
 
 	return posts, nil
