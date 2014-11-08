@@ -3,7 +3,11 @@
 		
 		<h2>Topics</h2>
 
-		<div><a href="/forum/{{.forum.Id}}/add">Add topic</a></div>
+		<div>
+			{{if .user}}
+			<a href="/forum/{{.forum.Id}}/add">Add topic</a>
+			{{end}}
+		</div>
 
 		<table>
 			<tr>
@@ -23,5 +27,9 @@
 			{{end}}
 		</table>
 
-		<div><a href="/forum/{{.forum.Id}}/add">Add topic</a></div>
+		<div>
+			{{if .user}}
+			<a href="/forum/{{.forum.Id}}/add">Add topic</a>
+			{{end}}
+		</div>
 {{template "footer.html" .}}

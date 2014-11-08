@@ -11,6 +11,8 @@ type Post struct {
 	Published time.Time
 	TopicId   int
 	UserId    int
+
+	// relations
 	User      *User
 }
 

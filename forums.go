@@ -301,6 +301,23 @@ func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
     http.Redirect(w, req, "/", 302)
 }
 
+func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.Request), pathToRedirect string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
+	    session, _ := app.sessions.Get(req, "forumSession")
+		if _, ok := session.Values["user_id"]; !ok {
+			if id, ok := mux.Vars(req)["id"]; ok {
+				pathToRedirect += "/" + id
+			}
+
+			app.addErrorFlash(w, req, errors.New("Must be logged in!"))
+			http.Redirect(w, req, pathToRedirect, 302)
+			return
+		}
+
+		nextHandler(w, req)
+	}
+}
+
 func backup() {
 	src, err := os.Open(DATABASE_FILE)
 	defer src.Close()
@@ -327,13 +344,13 @@ func main() {
 
 	f := r.PathPrefix("/forum").Subrouter()
 	f.HandleFunc("/{id:[0-9]+}", app.handleForum)
-	f.HandleFunc("/{id:[0-9]+}/add", app.handleAddTopic).Methods("GET")
-	f.HandleFunc("/{id:[0-9]+}/add", app.handleSaveTopic).Methods("POST")
+	f.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddTopic, "/forum")).Methods("GET")
+	f.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSaveTopic, "/forum")).Methods("POST")
 
 	t := r.PathPrefix("/topic").Subrouter()
 	t.HandleFunc("/{id:[0-9]+}", app.handleTopic)
-	t.HandleFunc("/{id:[0-9]+}/add", app.handleAddPost).Methods("GET")
-	t.HandleFunc("/{id:[0-9]+}/add", app.handleSavePost).Methods("POST")
+	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddPost, "/topic")).Methods("GET")
+	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSavePost, "/topic")).Methods("POST")
 
 	u := r.PathPrefix("/user").Subrouter()
 	u.HandleFunc("/add", app.handleRegister).Methods("GET")

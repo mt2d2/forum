@@ -4,7 +4,9 @@
 		<h2>Posts</h2>
 
 		<div>
+			{{if .user}}
 			<a href="/topic/{{.topic.Id}}/add">Add Post</a>
+			{{end}}
 		</div>
 
 		<table>
@@ -26,6 +28,8 @@
 		</table>
 
 		<div>
+			{{if .user}}
 			<a href="/topic/{{.topic.Id}}/add">Add Post</a>
+			{{end}}
 		</div>
 {{template "footer.html" .}}
