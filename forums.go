@@ -167,7 +167,7 @@ func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
     ok, errors := model.ValidateTopic(topic)
     if !ok {
     	app.addErrorFlashes(w, req, errors)
-    	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId") + "/add", 302)
+    	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId") + "/add", http.StatusFound)
     	return
     }
 
@@ -176,7 +176,7 @@ func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
     }
 
-	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId"), 302)
+	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId"), http.StatusFound)
 }
 
 func (app *App) handleAddPost(w http.ResponseWriter, req *http.Request) {
@@ -202,7 +202,7 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
     ok, errors := model.ValidatePost(post)
     if !ok {
     	app.addErrorFlashes(w, req, errors)
-    	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId") + "/add", 302)
+    	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId") + "/add", http.StatusFound)
     	return
     }
 
@@ -212,7 +212,7 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 		return
     }
 
-	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId"), 302)
+	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId"), http.StatusFound)
 }
 
 func (app *App) handleRegister(w http.ResponseWriter, req *http.Request) {
@@ -232,25 +232,25 @@ func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
     ok, errors := model.ValidateUser(user)
     if !ok {
     	app.addErrorFlashes(w, req, errors)
-    	http.Redirect(w, req, "/user/add", 302)
+    	http.Redirect(w, req, "/user/add", http.StatusFound)
     	return
     }
 
     err := user.HashPassword()
     if err != nil {
     	app.addErrorFlash(w, req, err)
-    	http.Redirect(w, req, "/user/add", 302)
+    	http.Redirect(w, req, "/user/add", http.StatusFound)
     	return
     }
 
     err = model.SaveUser(app.db, user)
 	if err != nil {
     	app.addErrorFlash(w, req, err)
-    	http.Redirect(w, req, "/user/add", 302)
+    	http.Redirect(w, req, "/user/add", http.StatusFound)
     	return
     }
 
-    http.Redirect(w, req, "/", 302)
+    http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func (app *App) handleLogin(w http.ResponseWriter, req *http.Request) {
@@ -266,7 +266,7 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 
 	if username == "" || len(password) == 0 {
 		app.addErrorFlash(w, req, errors.New("Enter a username and password."))
-		http.Redirect(w, req, "/user/login", 302)
+		http.Redirect(w, req, "/user/login", http.StatusFound)
 		return
 	}
 
@@ -275,14 +275,14 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 	user, err := model.FindOneUser(app.db, username)
 	if err != nil {
 		app.addErrorFlash(w, req, invalidUserOrPassword)
-		http.Redirect(w, req, "/user/login", 302)
+		http.Redirect(w, req, "/user/login", http.StatusFound)
 		return
 	}
 
 	err = user.CompareHashAndPassword(&password)
 	if err != nil {
 		app.addErrorFlash(w, req, invalidUserOrPassword)
-		http.Redirect(w, req, "/user/login", 302)
+		http.Redirect(w, req, "/user/login", http.StatusFound)
 		return
 	}
 
@@ -290,7 +290,7 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
     session.Values["user_id"] = user.Id
     session.Save(req, w)
 
-	http.Redirect(w, req, "/", 302)
+	http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
@@ -298,7 +298,7 @@ func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
     delete(session.Values, "user_id")
     session.Save(req, w)
 
-    http.Redirect(w, req, "/", 302)
+    http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.Request), pathToRedirect string) func(http.ResponseWriter, *http.Request) {
@@ -310,7 +310,7 @@ func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.
 			}
 
 			app.addErrorFlash(w, req, errors.New("Must be logged in!"))
-			http.Redirect(w, req, pathToRedirect, 302)
+			http.Redirect(w, req, pathToRedirect, http.StatusFound)
 			return
 		}
 
