@@ -32,11 +32,16 @@ func ValidatePost(post *Post) (ok bool, errs []error) {
 		errs = append(errs, errors.New("Post must belong to a valid topic."))
 	}
 
+	// todo, check for valid user id 
+	if post.UserId == -1 {
+		errs = append(errs, errors.New("Post must belong to a valid user."))
+	}
+
 	return len(errs) == 0, errs
 }
 
 func SavePost(db *sql.DB, post *Post) error {
-	_, err := db.Exec("INSERT INTO posts (id, text, published, topic_id) VALUES (NULL,?,?,?)", post.Text, post.Published, post.TopicId)
+	_, err := db.Exec("INSERT INTO posts (id, text, published, topic_id, user_id) VALUES (NULL,?,?,?,?)", post.Text, post.Published, post.TopicId, post.UserId)
 	return err
 }
 

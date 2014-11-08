@@ -199,6 +199,11 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 		return
     }
 
+    session, _ := app.sessions.Get(req, "forumSession")
+    if userId, ok := session.Values["user_id"].(int); ok {
+	    post.UserId = userId
+    }
+
     ok, errors := model.ValidatePost(post)
     if !ok {
     	app.addErrorFlashes(w, req, errors)
