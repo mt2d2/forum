@@ -44,7 +44,7 @@ func newApp() *App {
 		"templates/login.html",
 	))
 
-	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64))
+	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
 	return &App{templates, db, sessionStore}
 }
