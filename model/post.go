@@ -13,11 +13,11 @@ type Post struct {
 	UserId    int
 
 	// relations
-	User      *User
+	User *User
 }
 
 func NewPost() *Post {
-	return &Post{-1, "", time.Now().UTC(), -1, -1,nil}
+	return &Post{-1, "", time.Now().UTC(), -1, -1, nil}
 }
 
 func ValidatePost(post *Post) (ok bool, errs []error) {
@@ -32,7 +32,7 @@ func ValidatePost(post *Post) (ok bool, errs []error) {
 		errs = append(errs, errors.New("Post must belong to a valid topic."))
 	}
 
-	// todo, check for valid user id 
+	// todo, check for valid user id
 	if post.UserId == -1 {
 		errs = append(errs, errors.New("Post must belong to a valid user."))
 	}
@@ -68,8 +68,8 @@ func FindPosts(db *sql.DB, reqId string) ([]Post, error) {
 			return nil, err
 		}
 
-		posts = append(posts, Post{id, text, published, topicId, userId, 
-						&User{-1, username, "", []byte{}, []byte{}}})
+		posts = append(posts, Post{id, text, published, topicId, userId,
+			&User{-1, username, "", []byte{}, []byte{}}})
 	}
 
 	return posts, nil

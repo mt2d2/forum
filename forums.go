@@ -60,24 +60,24 @@ func (app *App) addErrorFlashes(w http.ResponseWriter, r *http.Request, errs []e
 }
 
 func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error error) {
-    session, _ := app.sessions.Get(r, "forumSession")
-    session.AddFlash(error.Error())
-    session.Save(r, w)
+	session, _ := app.sessions.Get(r, "forumSession")
+	session.AddFlash(error.Error())
+	session.Save(r, w)
 }
 
 func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
-    session, _ := app.sessions.Get(r, "forumSession")
-    
-    data["flashes"] = session.Flashes()
+	session, _ := app.sessions.Get(r, "forumSession")
 
-    if userId, ok := session.Values["user_id"].(int); ok {
-	    user, err := model.FindOneUserById(app.db, userId)
+	data["flashes"] = session.Flashes()
+
+	if userId, ok := session.Values["user_id"].(int); ok {
+		user, err := model.FindOneUserById(app.db, userId)
 		if err == nil {
-	    	data["user"] = user
-	    }
-    }
+			data["user"] = user
+		}
+	}
 
-    session.Save(r, w)
+	session.Save(r, w)
 
 	err := app.templates.ExecuteTemplate(w, tmpl+".html", data)
 	if err != nil {
@@ -157,26 +157,26 @@ func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	topic := model.NewTopic()
-    decoder := schema.NewDecoder()
-    err := decoder.Decode(topic, req.PostForm)
-    if err != nil {
+	decoder := schema.NewDecoder()
+	err := decoder.Decode(topic, req.PostForm)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-    }
+	}
 
-    ok, errors := model.ValidateTopic(topic)
-    if !ok {
-    	app.addErrorFlashes(w, req, errors)
-    	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId") + "/add", http.StatusFound)
-    	return
-    }
+	ok, errors := model.ValidateTopic(topic)
+	if !ok {
+		app.addErrorFlashes(w, req, errors)
+		http.Redirect(w, req, "/forum/"+req.PostFormValue("ForumId")+"/add", http.StatusFound)
+		return
+	}
 
 	err = model.SaveTopic(app.db, topic)
-    if err != nil {
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
+	}
 
-	http.Redirect(w, req, "/forum/" + req.PostFormValue("ForumId"), http.StatusFound)
+	http.Redirect(w, req, "/forum/"+req.PostFormValue("ForumId"), http.StatusFound)
 }
 
 func (app *App) handleAddPost(w http.ResponseWriter, req *http.Request) {
@@ -192,32 +192,32 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	post := model.NewPost()
-    decoder := schema.NewDecoder()
-    err := decoder.Decode(post, req.PostForm)
-    if err != nil {
+	decoder := schema.NewDecoder()
+	err := decoder.Decode(post, req.PostForm)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-    }
+	}
 
-    session, _ := app.sessions.Get(req, "forumSession")
-    if userId, ok := session.Values["user_id"].(int); ok {
-	    post.UserId = userId
-    }
+	session, _ := app.sessions.Get(req, "forumSession")
+	if userId, ok := session.Values["user_id"].(int); ok {
+		post.UserId = userId
+	}
 
-    ok, errors := model.ValidatePost(post)
-    if !ok {
-    	app.addErrorFlashes(w, req, errors)
-    	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId") + "/add", http.StatusFound)
-    	return
-    }
+	ok, errors := model.ValidatePost(post)
+	if !ok {
+		app.addErrorFlashes(w, req, errors)
+		http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId")+"/add", http.StatusFound)
+		return
+	}
 
 	err = model.SavePost(app.db, post)
-    if err != nil {
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-    }
+	}
 
-	http.Redirect(w, req, "/topic/" + req.PostFormValue("TopicId"), http.StatusFound)
+	http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId"), http.StatusFound)
 }
 
 func (app *App) handleRegister(w http.ResponseWriter, req *http.Request) {
@@ -229,33 +229,33 @@ func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	user := model.NewUser()
-    // manually grab password so we can convert to byte
-    user.Username = req.PostFormValue("Username")
-    user.Email = req.PostFormValue("Email")
-    user.Password = []byte(req.PostFormValue("Password"))
+	// manually grab password so we can convert to byte
+	user.Username = req.PostFormValue("Username")
+	user.Email = req.PostFormValue("Email")
+	user.Password = []byte(req.PostFormValue("Password"))
 
-    ok, errors := model.ValidateUser(user)
-    if !ok {
-    	app.addErrorFlashes(w, req, errors)
-    	http.Redirect(w, req, "/user/add", http.StatusFound)
-    	return
-    }
+	ok, errors := model.ValidateUser(user)
+	if !ok {
+		app.addErrorFlashes(w, req, errors)
+		http.Redirect(w, req, "/user/add", http.StatusFound)
+		return
+	}
 
-    err := user.HashPassword()
-    if err != nil {
-    	app.addErrorFlash(w, req, err)
-    	http.Redirect(w, req, "/user/add", http.StatusFound)
-    	return
-    }
-
-    err = model.SaveUser(app.db, user)
+	err := user.HashPassword()
 	if err != nil {
-    	app.addErrorFlash(w, req, err)
-    	http.Redirect(w, req, "/user/add", http.StatusFound)
-    	return
-    }
+		app.addErrorFlash(w, req, err)
+		http.Redirect(w, req, "/user/add", http.StatusFound)
+		return
+	}
 
-    http.Redirect(w, req, "/", http.StatusFound)
+	err = model.SaveUser(app.db, user)
+	if err != nil {
+		app.addErrorFlash(w, req, err)
+		http.Redirect(w, req, "/user/add", http.StatusFound)
+		return
+	}
+
+	http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func (app *App) handleLogin(w http.ResponseWriter, req *http.Request) {
@@ -291,24 +291,24 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-    session, _ := app.sessions.Get(req, "forumSession")
-    session.Values["user_id"] = user.Id
-    session.Save(req, w)
+	session, _ := app.sessions.Get(req, "forumSession")
+	session.Values["user_id"] = user.Id
+	session.Save(req, w)
 
 	http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
-    session, _ := app.sessions.Get(req, "forumSession")
-    delete(session.Values, "user_id")
-    session.Save(req, w)
+	session, _ := app.sessions.Get(req, "forumSession")
+	delete(session.Values, "user_id")
+	session.Save(req, w)
 
-    http.Redirect(w, req, "/", http.StatusFound)
+	http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.Request), pathToRedirect string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
-	    session, _ := app.sessions.Get(req, "forumSession")
+		session, _ := app.sessions.Get(req, "forumSession")
 		if _, ok := session.Values["user_id"]; !ok {
 			if id, ok := mux.Vars(req)["id"]; ok {
 				pathToRedirect += "/" + id

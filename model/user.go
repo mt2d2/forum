@@ -26,7 +26,7 @@ func (user *User) HashPassword() error {
 
 	// clear old password
 	for i := range user.Password {
-		user.Password[i] = 0;
+		user.Password[i] = 0
 	}
 
 	return nil
@@ -42,13 +42,13 @@ func (user *User) CompareHashAndPassword(password *[]byte) error {
 	}
 
 	err := bcrypt.CompareHashAndPassword(user.PasswordHash, *password)
-	if err != nil { 
+	if err != nil {
 		return err
 	}
 
 	// clear old password
 	for i := range *password {
-		(*password)[i] = 0;
+		(*password)[i] = 0
 	}
 
 	return nil
@@ -105,7 +105,7 @@ func FindOneUserById(db *sql.DB, reqId int) (User, error) {
 }
 
 func NewUser() *User {
-	return &User{-1, "", "", []byte{}, []byte{}, }
+	return &User{-1, "", "", []byte{}, []byte{}}
 }
 
 func SaveUser(db *sql.DB, user *User) error {
