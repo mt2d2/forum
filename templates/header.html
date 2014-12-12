@@ -1,25 +1,70 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<title>Forums</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	</head>
 	<body>
-	<h1><a href="/">Forum</a></h1>
 
-	<div id="header">
-		{{if .user}}
-		Logged in: {{.user.Username}} <a href="/user/logout">Logout</a>
-		{{else}}
-		 <a href="/user/login">Login</a> <a href="/user/add">Register</a>
-		{{end}}
-	</div>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">Forum</a>
+			</div>
 
-	{{if .flashes}}
-	<div id="flash">
-		<ul>
-		{{range $f := .flashes}}
-			<li>{{$f}}</li>
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+						<ul class="nav navbar-nav navbar-right">
+							{{if .user}}
+							<li><p class="navbar-text"><small>Logged in as {{.user.Username}}</small></p></li>
+							<li><a href="/user/logout">Logout</a></li>
+							{{else}}
+							<li><a href="/user/login">Login</a></li>
+							<li><a href="/user/add">Register</a></li>
+							{{end}}
+					</ul>
+				</div><!-- /.navbar-collapse -->
+			</div><!-- /.container-fluid -->
+		</nav>
+
+		<!-- <nav class="navbar navbar-default" role="navigation">
+			<div class="navbar-header">
+				<h1>Forum</h1>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav navbar-left brand">
+					<li><a href="/">Forum</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					{{if .user}}
+					<li>Logged in: {{.user.Username}}</li>
+					<li><a href="/user/logout">Logout</a></li>
+					{{else}}
+					<li><a href="/user/login">Login</a></li>
+					<li><a href="/user/add">Register</a></li>
+					{{end}}
+				</ul>
+			</div>
+		</nav> -->
+
+	<div class="container">
+
+		{{if .flashes}}
+		<div id="flash">
+			<ul>
+			{{range $f := .flashes}}
+				<li>{{$f}}</li>
+			{{end}}
+			</ul>
+		</div>
 		{{end}}
-		</ul>
-	</div>
-	{{end}}

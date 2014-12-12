@@ -1,19 +1,15 @@
 {{template "header.html" .}}
-		<table>
-			<tr>
-				<td>id</td>
-				<td>Title</td>
-				<td>Description</td>
-				<td>Topics</td>
-			</tr>
-
+		<div class="container">
 			{{range $f := .forums}}
-			<tr>
-				<td>{{$f.Id}}</td>
-				<td><a href="forum/{{$f.Id}}">{{$f.Title}}</a></td>
-				<td>{{$f.Description}}</td>
-				<td>{{$f.TopicCount}}</td>
-			</tr>
+			<div class="row">
+				<div class="col-md-10">
+					<h2><a href="forum/{{$f.Id}}">{{$f.Title}}</a>
+					<small>{{$f.Description}}</small></h2>
+				</div>
+				<div class="col-md-2">
+					<h3>{{$f.TopicCount}} topics</h3>
+				</div>
+			</div>
 			{{end}}
-		</table>
+		</div>
 {{template "footer.html" .}}

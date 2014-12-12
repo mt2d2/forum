@@ -345,6 +345,8 @@ func main() {
 	app := newApp()
 
 	r := mux.NewRouter()
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	
 	r.HandleFunc("/", app.handleIndex)
 
 	f := r.PathPrefix("/forum").Subrouter()
