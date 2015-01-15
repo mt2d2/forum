@@ -1,13 +1,13 @@
 {{template "header.html" .}}
-		<div class="container">
+		<div class="container-fluid">
 			{{range $f := .forums}}
-			<div class="row">
+			<div class="row item">
 				<div class="col-md-10">
-					<h2><a href="forum/{{$f.Id}}">{{$f.Title}}</a>
-					<small>{{$f.Description}}</small></h2>
+					<h1><a href="forum/{{$f.Id}}">{{$f.Title}}</a>
+					<small>{{$f.Description}}</small></h1>
 				</div>
 				<div class="col-md-2">
-					<h3>{{$f.TopicCount}} topics</h3>
+					<h2>{{$f.TopicCount}} topics</h2>
 				</div>
 			</div>
 			{{end}}

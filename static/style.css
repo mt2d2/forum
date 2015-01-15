@@ -1,0 +1,12 @@
+div.item div {
+  /*background: #fdd;*/
+  table-layout: fixed;
+  display: table;
+}
+
+div.item div h1, h2 {
+  height: 60px;
+  vertical-align: middle;
+  display: table-cell;
+  /*background: #eee;*/
+}
