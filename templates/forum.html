@@ -1,7 +1,5 @@
 {{template "header.html" .}}
-		<h1>{{.forum.Title}}: {{.forum.Description}}</h1>	
-		
-		<h2>Topics</h2>
+		<h1>{{.forum.Title}} <small>{{.forum.Description}}</small></h1>
 
 		<div>
 			{{if .user}}
@@ -9,23 +7,19 @@
 			{{end}}
 		</div>
 
-		<table>
-			<tr>
-				<td>id</td>
-				<td>Title</td>
-				<td>Description</td>
-				<td>Posts</td>
-			</tr>
-
+		<div class="container-fluid">
 			{{range $t := .topics}}
-			<tr>
-				<td>{{$t.Id}}</td>
-				<td><a href="/topic/{{$t.Id}}">{{$t.Title}}</a></td>
-				<td>{{$t.Description}}</td>
-				<td>{{$t.PostCount}}</td>
-			</tr>
+			<div class="row item">
+				<div class="col-md-10">
+					<h2><a href="/topic/{{$t.Id}}">{{$t.Title}}</a>
+							<small>{{$t.Description}}</small></h2>
+				</div>
+				<div class="col-md-2">
+						<h4>{{$t.PostCount}} posts</h4>
+				</div>
+			</div>
 			{{end}}
-		</table>
+		</div>
 
 		<div>
 			{{if .user}}

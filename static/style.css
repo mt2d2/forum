@@ -4,7 +4,7 @@ div.item div {
   display: table;
 }
 
-div.item div h1, h3 {
+div.item div h1, h2, h3, h4 {
   height: 60px;
   vertical-align: bottom;
   display: table-cell;
