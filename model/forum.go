@@ -8,7 +8,9 @@ type Forum struct {
 	Id          int
 	Title       string
 	Description string
+
 	TopicCount  int
+	PostCount   int
 }
 
 func FindOneForum(db *sql.DB, reqId string) (Forum, error) {
@@ -24,19 +26,27 @@ func FindOneForum(db *sql.DB, reqId string) (Forum, error) {
 		return Forum{}, errors.New("could not query for forum with id " + reqId)
 	}
 
-	return Forum{id, title, description, 0}, nil
+	return Forum{id, title, description, -1, -1}, nil
 }
 
-func topicCount(db *sql.DB, reqId string) (int, error) {
-	var count int
+func topicAndPostCount(db *sql.DB, reqId string) (int, int, error) {
+	var topicCount int
+	var postCount int
 
-	row := db.QueryRow("SELECT count(*) FROM topics WHERE forum_id = ?", reqId)
-	err := row.Scan(&count)
+	row := db.QueryRow(`select
+												count(distinct topics.id),
+	 											count(posts.id)
+											from forums
+												left join topics on topics.forum_id = forums.id
+												left join posts on posts.topic_id = topics.id
+											where forums.id = ?`, reqId)
+
+	err := row.Scan(&topicCount, &postCount)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
-	return count, nil
+	return topicCount, postCount, nil
 }
 
 func FindForums(db *sql.DB) ([]Forum, error) {
@@ -59,12 +69,12 @@ func FindForums(db *sql.DB) ([]Forum, error) {
 			return nil, errors.New("could not process row")
 		}
 
-		topicCount, err := topicCount(db, strconv.Itoa(id))
+		topicCount, postCount, err := topicAndPostCount(db, strconv.Itoa(id))
 		if err != nil {
-			return nil, errors.New("could not could topics for forum with id " + strconv.Itoa(id))
+			return nil, err
 		}
 
-		forums = append(forums, Forum{id, title, description, topicCount})
+		forums = append(forums, Forum{id, title, description, topicCount, postCount})
 	}
 
 	return forums, nil

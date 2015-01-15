@@ -4,9 +4,9 @@ div.item div {
   display: table;
 }
 
-div.item div h1, h2 {
+div.item div h1, h3 {
   height: 60px;
-  vertical-align: middle;
+  vertical-align: bottom;
   display: table-cell;
   /*background: #eee;*/
 }
