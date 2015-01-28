@@ -14,7 +14,7 @@ import "github.com/gorilla/Schema"
 import "github.com/gorilla/securecookie"
 import "github.com/gorilla/sessions"
 
-import "forum/model"
+import "github.com/mt2d2/forum/model"
 
 const (
 	DATABASE_FILE = "forums.db"
