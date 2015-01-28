@@ -14,7 +14,7 @@ import "github.com/gorilla/Schema"
 import "github.com/gorilla/securecookie"
 import "github.com/gorilla/sessions"
 
-import "forums/model"
+import "forum/model"
 
 const (
 	DATABASE_FILE = "forums.db"
@@ -346,7 +346,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
-	
+
 	r.HandleFunc("/", app.handleIndex)
 
 	f := r.PathPrefix("/forum").Subrouter()
