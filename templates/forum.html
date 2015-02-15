@@ -1,13 +1,13 @@
 {{template "header.html" .}}
-		<h1>{{.forum.Title}} <small>{{.forum.Description}}</small></h1>
-
-		<div>
-			{{if .user}}
-			<a href="/forum/{{.forum.Id}}/add">Add topic</a>
-			{{end}}
-		</div>
-
 		<div class="container-fluid">
+			<h1>{{.forum.Title}} <small>{{.forum.Description}}</small></h1>
+
+			<div>
+				{{if .user}}
+				<a href="/forum/{{.forum.Id}}/add">Add topic</a>
+				{{end}}
+			</div>
+			
 			{{range $t := .topics}}
 			<div class="row item">
 				<div class="col-md-10">
