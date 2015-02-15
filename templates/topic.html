@@ -1,6 +1,5 @@
 {{template "header.html" .}}
-		<h1>{{.topic.Title}}: {{.topic.Description}}</h1>	
-		
+		<h1>{{.topic.Title}}: {{.topic.Description}}</h1>
 		<h2>Posts</h2>
 
 		<div>
@@ -9,7 +8,7 @@
 			{{end}}
 		</div>
 
-		<table>
+		<!--<table>
 			<tr>
 				<td>id</td>
 				<td>User</td>
@@ -25,7 +24,25 @@
 				<td>{{$p.Text}}</td>
 			</tr>
 			{{end}}
-		</table>
+		</table>-->
+
+
+		<div class="container-fluid">
+			{{range $p := .posts}}
+			<div class="row item">
+				<div class="col-md-2">
+					<div class="container-fluid">
+						<div class="row">{{$p.User.Username}}</div>
+						<div class="row"><small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small></div>
+					</div>
+				</div>
+				<div class="col-md-10">
+					<p>{{$p.Text}}</p>
+				</div>
+			</div>
+			{{end}}
+		</div>
+
 
 		<div>
 			{{if .user}}
