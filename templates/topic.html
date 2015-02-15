@@ -1,33 +1,37 @@
 {{template "header.html" .}}
-		<div class="container-fluid">
-			<h1>{{.topic.Title}}: {{.topic.Description}}</h1>
-			<h2>Posts</h2>
+		<div class="row">
+			<div class="col-md-10">
+				<h1>{{.topic.Title}} <small>{{.topic.Description}}</small></h1>
+			</div>
+		</div>
 
-			<div>
-				{{if .user}}
+		{{if .user}}
+		<div class="row">
+			<div class="col-md-10">
 				<a href="/topic/{{.topic.Id}}/add">Add Post</a>
-				{{end}}
 			</div>
+		</div>
+		{{end}}
 
-			{{range $p := .posts}}
-			<div class="row item">
-				<div class="col-md-2">
-					<div class="container-fluid">
-						<div class="row">{{$p.User.Username}}</div>
-						<div class="row"><small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small></div>
-					</div>
-				</div>
-				<div class="col-md-10">
-					<p>{{$p.Text}}</p>
+		{{range $p := .posts}}
+		<div class="row item">
+			<div class="col-md-2">
+				<div class="container-fluid" style="padding-left: 0;">
+					<div class="row">{{$p.User.Username}}</div>
+					<div class="row"><small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small></div>
 				</div>
 			</div>
-			{{end}}
+			<div class="col-md-10">
+				<p class="post">{{$p.Text}}</p>
+			</div>
 		</div>
+		{{end}}
 
-
-		<div>
-			{{if .user}}
-			<a href="/topic/{{.topic.Id}}/add">Add Post</a>
-			{{end}}
+		{{if .user}}
+		<div class="row">
+			<div class="col-md-10">
+				<a href="/topic/{{.topic.Id}}/add">Add Post</a>
+			</div>
 		</div>
+		{{end}}
 {{template "footer.html" .}}

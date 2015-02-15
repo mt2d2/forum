@@ -1,10 +1,12 @@
 {{template "header.html" .}}
 		<form method="post">
-			<label for="Title">Title</label>
-			<input type="text" name="Title" />
-			<label for="Description">Description</label>
-			<input type="text" name="Description" />
-			<input type="hidden" name="ForumId" value="{{.ForumId}}" />
-			<input type="submit" value="Add topic" />
+			<div class="form-group">
+				<label for="Title">Title</label>
+				<input class="form-control" type="text" name="Title" />
+				<label for="Description">Description</label>
+				<input class="form-control" type="text" name="Description" />
+				<input type="hidden" name="ForumId" value="{{.ForumId}}" />
+			</div>
+			<button type="submit" class="btn btn-primary">Add topic</button>
 		</form>
 {{template "footer.html" .}}

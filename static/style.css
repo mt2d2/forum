@@ -10,3 +10,7 @@ div.item div h1, h2, h3, h4 {
   display: table-cell;
   /*background: #eee;*/
 }
+
+.post {
+  word-wrap: break-word;
+}
