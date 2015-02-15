@@ -310,12 +310,13 @@ func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.
 	return func(w http.ResponseWriter, req *http.Request) {
 		session, _ := app.sessions.Get(req, "forumSession")
 		if _, ok := session.Values["user_id"]; !ok {
+			newPath := pathToRedirect
 			if id, ok := mux.Vars(req)["id"]; ok {
-				pathToRedirect += "/" + id
+				newPath += "/" + id
 			}
 
 			app.addErrorFlash(w, req, errors.New("Must be logged in!"))
-			http.Redirect(w, req, pathToRedirect, http.StatusFound)
+			http.Redirect(w, req, newPath, http.StatusFound)
 			return
 		}
 
