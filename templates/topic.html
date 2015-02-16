@@ -14,11 +14,17 @@
 		{{end}}
 
 		{{range $p := .posts}}
-		<div class="row item">
+		<div class="row">
 			<div class="col-md-2">
-				<div class="container-fluid" style="padding-left: 0;">
-					<div class="row">{{$p.User.Username}}</div>
-					<div class="row"><small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small></div>
+				<div class="row">
+					<div class="col-md-12">
+						{{$p.User.Username}}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small>
+					</div>
 				</div>
 			</div>
 			<div class="col-md-10">
