@@ -1,7 +1,9 @@
 {{template "header.html" .}}
 		<form method="post">
-			<textarea name="Text"></textarea>
-			<input type="hidden" name="TopicId" value="{{.TopicId}}" />
-			<input type="submit" value="Add post" />
+			<div class="form-group">
+				<textarea class="form-control" name="Text"></textarea>
+				<input type="hidden" name="TopicId" value="{{.TopicId}}" />
+			</div>
+			<button type="submit" class="btn btn-primary">Add post</button>
 		</form>
 {{template "footer.html" .}}
