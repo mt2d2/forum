@@ -23,40 +23,20 @@
 				<a class="navbar-brand" href="/">Forum</a>
 			</div>
 
-				<!-- Collect the nav links, forms, and other content for toggling -->
-				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-						<ul class="nav navbar-nav navbar-right">
-							{{if .user}}
-							<li><p class="navbar-text"><small>Logged in as {{.user.Username}}</small></p></li>
-							<li><a href="/user/logout">Logout</a></li>
-							{{else}}
-							<li><a href="/user/login">Login</a></li>
-							<li><a href="/user/add">Register</a></li>
-							{{end}}
-					</ul>
-				</div><!-- /.navbar-collapse -->
-			</div><!-- /.container-fluid -->
-		</nav>
-
-		<!-- <nav class="navbar navbar-default" role="navigation">
-			<div class="navbar-header">
-				<h1>Forum</h1>
-			</div>
-			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav navbar-left brand">
-					<li><a href="/">Forum</a></li>
-				</ul>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav navbar-right">
 					{{if .user}}
-					<li>Logged in: {{.user.Username}}</li>
+					<li><p class="navbar-text"><small>Logged in as {{.user.Username}}</small></p></li>
 					<li><a href="/user/logout">Logout</a></li>
 					{{else}}
 					<li><a href="/user/login">Login</a></li>
 					<li><a href="/user/add">Register</a></li>
 					{{end}}
 				</ul>
-			</div>
-		</nav> -->
+			</div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>
 
 	<div class="container-fluid">
 
