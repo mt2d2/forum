@@ -60,15 +60,24 @@ func (app *App) addErrorFlashes(w http.ResponseWriter, r *http.Request, errs []e
 }
 
 func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error error) {
+	app.addFlash(w, r, error.Error(), "error")
+}
+
+func (app *App) addSuccessFlash(w http.ResponseWriter, r *http.Request, str string) {
+	app.addFlash(w, r, str, "success")
+}
+
+func (app *App) addFlash(w http.ResponseWriter, r *http.Request, content interface{}, key string) {
 	session, _ := app.sessions.Get(r, "forumSession")
-	session.AddFlash(error.Error())
+	session.AddFlash(content, key)
 	session.Save(r, w)
 }
 
 func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
 	session, _ := app.sessions.Get(r, "forumSession")
 
-	data["flashes"] = session.Flashes()
+	data["errorFlashes"] = session.Flashes("error")
+	data["successFlashes"] = session.Flashes("success")
 
 	if userId, ok := session.Values["user_id"].(int); ok {
 		user, err := model.FindOneUserById(app.db, userId)
@@ -295,6 +304,8 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 	session.Values["user_id"] = user.Id
 	session.Save(req, w)
 
+	app.addSuccessFlash(w, req, "Successfully logged in!")
+
 	http.Redirect(w, req, "/", http.StatusFound)
 }
 
@@ -302,6 +313,8 @@ func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
 	session, _ := app.sessions.Get(req, "forumSession")
 	delete(session.Values, "user_id")
 	session.Save(req, w)
+
+	app.addSuccessFlash(w, req, "Successfully logged out.")
 
 	http.Redirect(w, req, "/", http.StatusFound)
 }
