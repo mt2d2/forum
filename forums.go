@@ -269,6 +269,7 @@ func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
 
 func (app *App) handleLogin(w http.ResponseWriter, req *http.Request) {
 	results := make(map[string]interface{})
+	results["Referer"] = req.Referer()
 	app.renderTemplate(w, req, "login", results)
 }
 
@@ -306,7 +307,12 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 
 	app.addSuccessFlash(w, req, "Successfully logged in!")
 
-	http.Redirect(w, req, "/", http.StatusFound)
+	toRedirect := req.PostFormValue("Referer")
+	if toRedirect == "" {
+			toRedirect = "/"
+	}
+
+	http.Redirect(w, req, toRedirect, http.StatusFound)
 }
 
 func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
@@ -316,7 +322,12 @@ func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
 
 	app.addSuccessFlash(w, req, "Successfully logged out.")
 
-	http.Redirect(w, req, "/", http.StatusFound)
+	toRedirect := req.Referer()
+	if toRedirect == "" {
+			toRedirect = "/"
+	}
+	
+	http.Redirect(w, req, toRedirect, http.StatusFound)
 }
 
 func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.Request), pathToRedirect string) func(http.ResponseWriter, *http.Request) {
