@@ -33,7 +33,7 @@ func ValidatePost(db *sql.DB, post *Post) (ok bool, errs []error) {
 	}
 
 	// todo, check for valid user id
-	if _, err := FindOneUserById(db, strconv.Itoa(post.UserId)); post.UserId == -1 || err != nil {
+	if _, err := FindOneUserById(db, post.UserId); post.UserId == -1 || err != nil {
 		errs = append(errs, errors.New("Post must belong to a valid user."))
 	}
 
