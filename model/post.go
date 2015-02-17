@@ -3,6 +3,7 @@ package model
 import "errors"
 import "database/sql"
 import "time"
+import "strconv"
 import "strings"
 
 type Post struct {
@@ -20,15 +21,14 @@ func NewPost() *Post {
 	return &Post{-1, "", time.Now().UTC(), -1, -1, nil}
 }
 
-func ValidatePost(post *Post) (ok bool, errs []error) {
+func ValidatePost(db *sql.DB, post *Post) (ok bool, errs []error) {
 	errs = make([]error, 0)
 
 	if strings.TrimSpace(post.Text) == "" {
 		errs = append(errs, errors.New("Post must have some text."))
 	}
 
-	// todo, check for valid topic id with database query
-	if post.TopicId == -1 {
+	if _, err := FindOneTopic(db, strconv.Itoa(post.TopicId)); post.TopicId == -1 || err != nil {
 		errs = append(errs, errors.New("Post must belong to a valid topic."))
 	}
 

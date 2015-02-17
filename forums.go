@@ -213,7 +213,7 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 		post.UserId = userId
 	}
 
-	ok, errors := model.ValidatePost(post)
+	ok, errors := model.ValidatePost(app.db, post)
 	if !ok {
 		app.addErrorFlashes(w, req, errors)
 		http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId")+"/add", http.StatusFound)
