@@ -173,7 +173,7 @@ func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ok, errors := model.ValidateTopic(topic)
+	ok, errors := model.ValidateTopic(app.db, topic)
 	if !ok {
 		app.addErrorFlashes(w, req, errors)
 		http.Redirect(w, req, "/forum/"+req.PostFormValue("ForumId")+"/add", http.StatusFound)

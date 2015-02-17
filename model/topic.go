@@ -17,7 +17,7 @@ func NewTopic() *Topic {
 	return &Topic{-1, "", "", -1, -1}
 }
 
-func ValidateTopic(topic *Topic) (ok bool, errs []error) {
+func ValidateTopic(db *sql.DB, topic *Topic) (ok bool, errs []error) {
 	errs = make([]error, 0)
 
 	trimmedTitle := strings.TrimSpace(topic.Title)
@@ -35,8 +35,7 @@ func ValidateTopic(topic *Topic) (ok bool, errs []error) {
 		errs = append(errs, errors.New("Topic description is too long."))
 	}
 
-	// todo, check for valid forum id with database query
-	if topic.ForumId == -1 {
+	if _, err := FindOneForum(db, strconv.Itoa(topic.ForumId)); topic.ForumId == -1 || err != nil {
 		errs = append(errs, errors.New("Post must belong to a valid topic."))
 	}
 
