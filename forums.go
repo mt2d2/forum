@@ -5,6 +5,7 @@ import "html/template"
 import "io"
 import "net/http"
 import "os"
+import "strings"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
 
@@ -308,7 +309,7 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 	app.addSuccessFlash(w, req, "Successfully logged in!")
 
 	toRedirect := req.PostFormValue("Referer")
-	if toRedirect == "" {
+	if toRedirect == "" || strings.HasSuffix(toRedirect, "login") {
 			toRedirect = "/"
 	}
 
@@ -326,7 +327,7 @@ func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
 	if toRedirect == "" {
 			toRedirect = "/"
 	}
-	
+
 	http.Redirect(w, req, toRedirect, http.StatusFound)
 }
 
