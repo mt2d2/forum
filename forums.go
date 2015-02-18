@@ -9,6 +9,8 @@ import "strings"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
 
+import "github.com/microcosm-cc/bluemonday"
+import "github.com/russross/blackfriday"
 import "github.com/daaku/go.httpgzip"
 import "github.com/gorilla/mux"
 import "github.com/gorilla/Schema"
@@ -27,13 +29,19 @@ type App struct {
 	sessions  *sessions.CookieStore
 }
 
+func convertToMarkdown(markdown string) template.HTML {
+		unsafe := blackfriday.MarkdownCommon([]byte(markdown))
+		html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
+		return template.HTML(html)
+}
+
 func newApp() *App {
 	db, err := sql.Open("sqlite3", DATABASE_FILE)
 	if err != nil {
 		panic("error opening database")
 	}
 
-	templates := template.Must(template.ParseFiles(
+	templates, err := template.New("").Funcs(template.FuncMap{"markDown": convertToMarkdown}).ParseFiles(
 		"templates/header.html",
 		"templates/footer.html",
 		"templates/index.html",
@@ -43,7 +51,11 @@ func newApp() *App {
 		"templates/addTopic.html",
 		"templates/register.html",
 		"templates/login.html",
-	))
+	)
+
+	if err != nil {
+		panic(err)
+	}
 
 	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
