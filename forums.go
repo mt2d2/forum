@@ -35,7 +35,7 @@ func convertToMarkdown(markdown string) template.HTML {
 
 	policy := bluemonday.UGCPolicy()
 	policy.AllowElements("video", "audio", "source")
-	policy.AllowAttrs("controls").On("video", "audio")
+	policy.AllowAttrs("controls").OnElements("video", "audio")
 	policy.AllowAttrs("src").Matching(regexp.MustCompile(`[\p{L}\p{N}\s\-_',:\[\]!\./\\\(\)&]*`)).Globally()
 
 	html := policy.SanitizeBytes(unsafe)
