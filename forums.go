@@ -31,7 +31,11 @@ type App struct {
 
 func convertToMarkdown(markdown string) template.HTML {
 	unsafe := blackfriday.MarkdownCommon([]byte(markdown))
-	html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
+
+	policy := bluemonday.UGCPolicy()
+	policy.AllowElements("video", "audio")
+	
+	html := policy.SanitizeBytes(unsafe)
 	return template.HTML(html)
 }
 
