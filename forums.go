@@ -30,9 +30,9 @@ type App struct {
 }
 
 func convertToMarkdown(markdown string) template.HTML {
-		unsafe := blackfriday.MarkdownCommon([]byte(markdown))
-		html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
-		return template.HTML(html)
+	unsafe := blackfriday.MarkdownCommon([]byte(markdown))
+	html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
+	return template.HTML(html)
 }
 
 func newApp() *App {
@@ -322,7 +322,7 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 
 	toRedirect := req.PostFormValue("Referer")
 	if toRedirect == "" || strings.HasSuffix(toRedirect, "login") {
-			toRedirect = "/"
+		toRedirect = "/"
 	}
 
 	http.Redirect(w, req, toRedirect, http.StatusFound)
@@ -337,7 +337,7 @@ func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
 
 	toRedirect := req.Referer()
 	if toRedirect == "" {
-			toRedirect = "/"
+		toRedirect = "/"
 	}
 
 	http.Redirect(w, req, toRedirect, http.StatusFound)
