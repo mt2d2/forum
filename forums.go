@@ -5,6 +5,7 @@ import "html/template"
 import "io"
 import "net/http"
 import "os"
+import "regexp"
 import "strings"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
@@ -33,8 +34,9 @@ func convertToMarkdown(markdown string) template.HTML {
 	unsafe := blackfriday.MarkdownCommon([]byte(markdown))
 
 	policy := bluemonday.UGCPolicy()
-	policy.AllowElements("video", "audio")
-	policy.AllowAttrs("src", "controls").OnElements("video", "audio")
+	policy.AllowElements("video", "audio", "source")
+	policy.AllowAttrs("controls")
+	policy.AllowAttrs("src").Matching(regexp.MustCompile(`[\p{L}\p{N}\s\-_',:\[\]!\./\\\(\)&]*`)).Globally()
 
 	html := policy.SanitizeBytes(unsafe)
 	return template.HTML(html)
