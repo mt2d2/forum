@@ -249,6 +249,39 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId"), http.StatusFound)
 }
 
+func (app *App) handleDeletePost(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	session, _ := app.sessions.Get(req, "forumSession")
+	if userId, ok := session.Values["user_id"].(int); ok {
+		user, err := model.FindOneUserById(app.db, userId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		post, err := model.FindOnePost(app.db, req.PostFormValue("PostId"))
+		if err != nil {
+			app.addErrorFlash(w, req, err)
+			http.Redirect(w, req, "/", http.StatusFound)
+			return
+		}
+
+		if user.Id !=  post.User.Id {
+			app.addErrorFlash(w, req, errors.New("You can only delete your own posts!"))
+			http.Redirect(w, req, "/", http.StatusFound)
+			return
+		}
+
+		model.DeletePost(app.db, post.Id)
+		http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId"), http.StatusFound)
+		return
+	} else {
+		app.addErrorFlash(w, req, errors.New("Must be logged in!"))
+		http.Redirect(w, req, "/", http.StatusFound)
+		return
+	}
+}
+
 func (app *App) handleRegister(w http.ResponseWriter, req *http.Request) {
 	results := make(map[string]interface{})
 	app.renderTemplate(w, req, "register", results)
@@ -403,6 +436,8 @@ func main() {
 	t.HandleFunc("/{id:[0-9]+}", app.handleTopic)
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddPost, "/topic")).Methods("GET")
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSavePost, "/topic")).Methods("POST")
+	t.HandleFunc("/{id:[0-9]+}/delete", app.handleLoginRequired(app.handleDeletePost, "/topic")).Methods("POST")
+
 
 	u := r.PathPrefix("/user").Subrouter()
 	u.HandleFunc("/add", app.handleRegister).Methods("GET")

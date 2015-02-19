@@ -44,6 +44,30 @@ func SavePost(db *sql.DB, post *Post) error {
 	return err
 }
 
+func DeletePost(db *sql.DB, reqId int) (err error) {
+	_, err = db.Exec("delete from posts where id=?", reqId)
+	return
+}
+
+func FindOnePost(db *sql.DB, reqId string) (Post, error) {
+	var (
+		id        int
+		text      string
+		published time.Time
+		topicId   int
+		userId    int
+		username  string
+	)
+
+	row := db.QueryRow("SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.id WHERE posts.id=?", reqId)
+	err := row.Scan(&id, &text, &published, &topicId, &userId, &username)
+	if err != nil {
+		return Post{}, err
+	}
+
+	return Post{id, text, published, topicId, userId, &User{userId, username, "", []byte{}, []byte{}}}, nil
+}
+
 func FindPosts(db *sql.DB, reqId string) ([]Post, error) {
 	rows, err := db.Query("SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.id WHERE topic_id=? ORDER BY datetime(published) ASC", reqId)
 	defer rows.Close()
@@ -68,7 +92,7 @@ func FindPosts(db *sql.DB, reqId string) ([]Post, error) {
 		}
 
 		posts = append(posts, Post{id, text, published, topicId, userId,
-			&User{-1, username, "", []byte{}, []byte{}}})
+			&User{userId, username, "", []byte{}, []byte{}}})
 	}
 
 	return posts, nil
