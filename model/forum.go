@@ -9,8 +9,8 @@ type Forum struct {
 	Title       string
 	Description string
 
-	TopicCount  int
-	PostCount   int
+	TopicCount int
+	PostCount  int
 }
 
 func FindOneForum(db *sql.DB, reqId string) (Forum, error) {

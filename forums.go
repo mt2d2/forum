@@ -266,7 +266,7 @@ func (app *App) handleDeletePost(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		if user.Id !=  post.User.Id {
+		if user.Id != post.User.Id {
 			app.addErrorFlash(w, req, errors.New("You can only delete your own posts!"))
 			http.Redirect(w, req, "/", http.StatusFound)
 			return
@@ -437,7 +437,6 @@ func main() {
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddPost, "/topic")).Methods("GET")
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSavePost, "/topic")).Methods("POST")
 	t.HandleFunc("/{id:[0-9]+}/delete", app.handleLoginRequired(app.handleDeletePost, "/topic")).Methods("POST")
-
 
 	u := r.PathPrefix("/user").Subrouter()
 	u.HandleFunc("/add", app.handleRegister).Methods("GET")
