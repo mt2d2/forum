@@ -61,7 +61,12 @@ func FindOneTopic(db *sql.DB, reqId string) (Topic, error) {
 		return Topic{}, errors.New("could not query for topic with id " + reqId)
 	}
 
-	return Topic{id, title, description, forumId, 0}, nil
+	postCount, err := postCount(db, reqId)
+	if err != nil {
+		return Topic{}, err
+	}
+
+	return Topic{id, title, description, forumId, postCount}, nil
 }
 
 func postCount(db *sql.DB, reqId string) (int, error) {

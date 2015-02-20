@@ -4,8 +4,10 @@ import "errors"
 import "html/template"
 import "io"
 import "net/http"
+import "math"
 import "os"
 import "regexp"
+import "strconv"
 import "strings"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
@@ -22,6 +24,7 @@ import "github.com/mt2d2/forum/model"
 
 const (
 	DATABASE_FILE = "forums.db"
+	LIMIT_POSTS = 10
 )
 
 type App struct {
@@ -153,6 +156,12 @@ func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
+	pageOffset := 0
+	if page, ok := vars["page"]; ok {
+		if val, err := strconv.Atoi(page); err == nil {
+			pageOffset = val - 1
+		}
+	}
 
 	topic, err := model.FindOneTopic(app.db, id)
 	if err != nil {
@@ -160,7 +169,13 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	posts, err := model.FindPosts(app.db, id)
+	numberOfPages := int(math.Ceil(float64(topic.PostCount) / float64(LIMIT_POSTS)))
+	pageIndicies := make([]int, numberOfPages)
+	for i := 0; i < numberOfPages; i++ {
+		pageIndicies[i] = i + 1
+	}
+
+	posts, err := model.FindPosts(app.db, id, LIMIT_POSTS, pageOffset * LIMIT_POSTS)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -169,6 +184,8 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 	results := make(map[string]interface{})
 	results["topic"] = topic
 	results["posts"] = posts
+	results["pageIndicies"] = pageIndicies
+	results["currentPage"] = int(pageOffset + 1)
 
 	app.renderTemplate(w, req, "topic", results)
 }
@@ -434,6 +451,7 @@ func main() {
 
 	t := r.PathPrefix("/topic").Subrouter()
 	t.HandleFunc("/{id:[0-9]+}", app.handleTopic)
+	t.HandleFunc("/{id:[0-9]+}/page/{page:[0-9]+}", app.handleTopic)
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddPost, "/topic")).Methods("GET")
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSavePost, "/topic")).Methods("POST")
 	t.HandleFunc("/{id:[0-9]+}/delete", app.handleLoginRequired(app.handleDeletePost, "/topic")).Methods("POST")

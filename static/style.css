@@ -14,3 +14,7 @@ div.item div h1, h2, h3, h4 {
 .post {
   word-wrap: break-word;
 }
+
+.pageCount {
+  text-align: right;
+}

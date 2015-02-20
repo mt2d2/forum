@@ -68,8 +68,8 @@ func FindOnePost(db *sql.DB, reqId string) (Post, error) {
 	return Post{id, text, published, topicId, userId, &User{userId, username, "", []byte{}, []byte{}}}, nil
 }
 
-func FindPosts(db *sql.DB, reqId string) ([]Post, error) {
-	rows, err := db.Query("SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.id WHERE topic_id=? ORDER BY datetime(published) ASC", reqId)
+func FindPosts(db *sql.DB, reqId string, limit int, offset int) ([]Post, error) {
+	rows, err := db.Query("SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.id WHERE topic_id=? ORDER BY datetime(published) ASC LIMIT ? OFFSET ?", reqId, limit, offset)
 	defer rows.Close()
 	if err != nil {
 		return nil, errors.New("could not query for posts for topic " + reqId)
