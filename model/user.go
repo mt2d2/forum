@@ -54,14 +54,17 @@ func (user *User) CompareHashAndPassword(password *[]byte) error {
 	return nil
 }
 
-func ValidateUser(user *User) (ok bool, errs []error) {
+func ValidateUser(db *sql.DB, user *User) (ok bool, errs []error) {
 	errs = make([]error, 0)
 
 	if user.Username == "" {
 		errs = append(errs, errors.New("Username must not be empty."))
 	}
 
-	// todo, check for unique username
+	_, err := FindOneUser(db, user.Username)
+	if err == nil {
+		errs = append(errs, errors.New("Username must be unique."))
+	}
 
 	if len(user.Password) == 0 {
 		errs = append(errs, errors.New("Password must not be empty."))

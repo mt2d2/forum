@@ -313,7 +313,7 @@ func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
 	user.Email = req.PostFormValue("Email")
 	user.Password = []byte(req.PostFormValue("Password"))
 
-	ok, errors := model.ValidateUser(user)
+	ok, errors := model.ValidateUser(app.db, user)
 	if !ok {
 		app.addErrorFlashes(w, req, errors)
 		http.Redirect(w, req, "/user/add", http.StatusFound)
