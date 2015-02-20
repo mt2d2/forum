@@ -78,7 +78,7 @@ Delete</button>
 				<ul class="pagination">
 					{{range .pageIndicies}}
 					{{if eq $.currentPage .}}
-					<li class="active">{{.}}</li>
+					<li class="active"><a>{{.}}</a></li>
 					{{else}}
 					<li><a href="/topic/{{$.topic.Id}}/page/{{.}}">{{.}}</a></li>
 					{{end}}
