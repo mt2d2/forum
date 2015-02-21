@@ -1,26 +1,26 @@
 {{template "header.html" .}}
-		<div class="row item">
+		<div class="row">
 			<div class="col-md-10">
-				<h1>{{.forum.Title}} <small>{{.forum.Description}}</small></h1>
+				<span class="h1">{{.forum.Title}} <small>{{.forum.Description}}</small></span>
 			</div>
 		</div>
 
 		{{if .user}}
-		<div class="row">
+		<div class="row topBuffer">
 			<div class="col-md-10">
-				<a href="/forum/{{.forum.Id}}/add">Add topic</a>
+				<a class="btn btn-primary" role="button"href="/forum/{{.forum.Id}}/add">Add topic</a>
 			</div>
 		</div>
 		{{end}}
 
 		{{range $t := .topics}}
-		<div class="row item">
+		<div class="row item topBuffer">
 			<div class="col-md-10">
-				<h2><a href="/topic/{{$t.Id}}">{{$t.Title}}</a>
-						<small>{{$t.Description}}</small></h2>
+				<span class="h2"><a href="/topic/{{$t.Id}}">{{$t.Title}}</a>
+						<small>{{$t.Description}}</small></span>
 			</div>
 			<div class="col-md-2">
-					<h4>{{$t.PostCount}} posts</h4>
+					<span class="h4">{{$t.PostCount}} posts</span>
 			</div>
 		</div>
 		{{end}}
@@ -28,7 +28,7 @@
 		<div class="row">
 			<div class="col-md-8">
 				{{if .user}}
-				<a href="/forum/{{.forum.Id}}/add">Add topic</a>
+				<a class="btn btn-primary topBuffer" role="button" href="/forum/{{.forum.Id}}/add">Add topic</a>
 				{{end}}
 			</div>
 			<div class="col-md-4">
