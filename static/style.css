@@ -18,3 +18,12 @@ div.item div h1, h2, h3, h4 {
 .pageCount {
   text-align: right;
 }
+
+
+.topBuffer {
+  margin-top: 15px;
+}
+
+.bottomBuffer {
+  margin-bottom: 15px;
+}
