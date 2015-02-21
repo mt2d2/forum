@@ -47,24 +47,24 @@ Delete</button>
 						<small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small>
 					</div>
 				</div>
+
+			</div>
+			<div class="col-md-10 post">
 				{{if $.user}}
 				{{if eq $.user.Id $p.User.Id}}
-				<div class="row">
-					<div class="col-md-12">
-						<form action ="/topic/{{$.topic.Id}}/delete" method="POST">
-							<input type="hidden" name="TopicId" value="{{$.topic.Id}}" />
-							<input type="hidden" name="PostId" value="{{$p.Id}}" />
-							<button class='btn btn-danger btn-xs' type="submit" name="removePost" value="delete"><span class="fa fa-times"></span> delete</button>
-						</form>
-					</div>
+				<div class="deletePost">
+					<form action ="/topic/{{$.topic.Id}}/delete" method="POST">
+						<input type="hidden" name="TopicId" value="{{$.topic.Id}}" />
+						<input type="hidden" name="PostId" value="{{$p.Id}}" />
+						<button type="button" class="close" name="removePost" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</form>
 				</div>
 				{{end}}
 				{{end}}
-			</div>
-			<div class="col-md-10">
-				<span class="post">
-					{{$p.Text | markDown}}
-				</span>
+
+				{{$p.Text | markDown}}
 			</div>
 		</div>
 		{{end}}
