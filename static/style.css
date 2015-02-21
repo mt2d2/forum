@@ -30,6 +30,7 @@ div.item div h1, h2, h3, h4 {
 }
 
 .deletePost {
-  position: absolute;
-  right: 15px;
+  float: right;
+  padding-left: 5px;
+  padding-bottom: 5px;
 }
