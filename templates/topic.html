@@ -1,14 +1,14 @@
 {{template "header.html" .}}
-		<div class="row">
+		<div class="row" class="bottomBuffer">
 			<div class="col-md-10">
-				<h1>{{.topic.Title}} <small>{{.topic.Description}}</small></h1>
+				<span class="h1">{{.topic.Title}} <small>{{.topic.Description}}</small></span>
 			</div>
 		</div>
 
 		{{if .user}}
-		<div class="row">
+		<div class="row topBuffer">
 			<div class="col-md-10">
-				<a class="btn btn-primary bottomBuffer" role="button" href="/topic/{{.topic.Id}}/add">Add Post</a>
+				<a class="btn btn-primary" role="button" href="/topic/{{.topic.Id}}/add">Add Post</a>
 			</div>
 		</div>
 		{{end}}
@@ -19,7 +19,7 @@
 				<div class="modal-dialog">
 						<div class="modal-content">
 								<div class="modal-header">
-										<h4>Delete post?</h4>
+										<span class="h4">Delete post?</span>
 								</div>
 								<div class="modal-body">
 										<p>Are you sure you want to delete this post?</p>
@@ -35,7 +35,7 @@ Delete</button>
 		{{end}}
 
 		{{range $p := .posts}}
-		<div class="row">
+		<div class="row topBuffer">
 			<div class="col-md-2">
 				<div class="row">
 					<div class="col-md-12">
@@ -62,7 +62,9 @@ Delete</button>
 				{{end}}
 			</div>
 			<div class="col-md-10">
-				<p class="post">{{$p.Text | markDown}}</p>
+				<span class="post">
+					{{$p.Text | markDown}}
+				</span>
 			</div>
 		</div>
 		{{end}}
