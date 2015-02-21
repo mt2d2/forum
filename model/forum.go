@@ -26,7 +26,12 @@ func FindOneForum(db *sql.DB, reqId string) (Forum, error) {
 		return Forum{}, errors.New("could not query for forum with id " + reqId)
 	}
 
-	return Forum{id, title, description, -1, -1}, nil
+	topicCount, postCount, err := topicAndPostCount(db, reqId)
+	if err != nil {
+		return Forum{}, err
+	}
+
+	return Forum{id, title, description, topicCount, postCount}, nil
 }
 
 func topicAndPostCount(db *sql.DB, reqId string) (int, int, error) {

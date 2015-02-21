@@ -25,11 +25,24 @@
 		</div>
 		{{end}}
 
-		{{if .user}}
 		<div class="row">
-			<div class="col-md-10">
+			<div class="col-md-8">
+				{{if .user}}
 				<a href="/forum/{{.forum.Id}}/add">Add topic</a>
+				{{end}}
+			</div>
+			<div class="col-md-4">
+				<nav class="pageCount">
+					<ul class="pagination">
+						{{range .pageIndicies}}
+						{{if eq $.currentPage .}}
+						<li class="active"><a>{{.}}</a></li>
+						{{else}}
+						<li><a href="/forum/{{$.forum.Id}}/page/{{.}}">{{.}}</a></li>
+						{{end}}
+						{{end}}
+					</ul>
+				</nav>
 			</div>
 		</div>
-		{{end}}
 {{template "footer.html" .}}

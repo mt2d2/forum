@@ -25,6 +25,7 @@ import "github.com/mt2d2/forum/model"
 const (
 	DATABASE_FILE = "forums.db"
 	LIMIT_POSTS = 10
+	LIMIT_TOPICS = 10
 )
 
 type App struct {
@@ -134,13 +135,25 @@ func (app *App) handleIndex(w http.ResponseWriter, req *http.Request) {
 func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
+	pageOffset := 0
+	if page, ok := vars["page"]; ok {
+		if val, err := strconv.Atoi(page); err == nil {
+			pageOffset = val - 1
+		}
+	}
 
 	forum, err := model.FindOneForum(app.db, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	topics, err := model.FindTopics(app.db, id)
+	numberOfPages := int(math.Ceil(float64(forum.TopicCount) / float64(LIMIT_TOPICS)))
+	pageIndicies := make([]int, numberOfPages)
+	for i := 0; i < numberOfPages; i++ {
+		pageIndicies[i] = i + 1
+	}
+
+	topics, err := model.FindTopics(app.db, id, LIMIT_TOPICS, pageOffset * LIMIT_TOPICS)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -149,6 +162,8 @@ func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 	results := make(map[string]interface{})
 	results["forum"] = forum
 	results["topics"] = topics
+	results["pageIndicies"] = pageIndicies
+	results["currentPage"] = int(pageOffset + 1)
 
 	app.renderTemplate(w, req, "forum", results)
 }
@@ -446,6 +461,7 @@ func main() {
 
 	f := r.PathPrefix("/forum").Subrouter()
 	f.HandleFunc("/{id:[0-9]+}", app.handleForum)
+	f.HandleFunc("/{id:[0-9]+}/page/{page:[0-9]+}", app.handleForum)
 	f.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddTopic, "/forum")).Methods("GET")
 	f.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSaveTopic, "/forum")).Methods("POST")
 

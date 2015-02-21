@@ -81,8 +81,8 @@ func postCount(db *sql.DB, reqId string) (int, error) {
 	return count, nil
 }
 
-func FindTopics(db *sql.DB, reqId string) ([]Topic, error) {
-	rows, err := db.Query("SELECT * FROM topics WHERE forum_id = ?", reqId)
+func FindTopics(db *sql.DB, reqId string, limit int, offset int) ([]Topic, error) {
+	rows, err := db.Query("SELECT * FROM topics WHERE forum_id = ? LIMIT ? OFFSET ?", reqId, limit, offset)
 	defer rows.Close()
 	if err != nil {
 		return nil, errors.New("could not query for topics for fourm " + reqId)
