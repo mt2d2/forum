@@ -460,14 +460,14 @@ func main() {
 	r.HandleFunc("/", app.handleIndex)
 
 	f := r.PathPrefix("/forum").Subrouter()
-	f.HandleFunc("/{id:[0-9]+}", app.handleForum)
-	f.HandleFunc("/{id:[0-9]+}/page/{page:[0-9]+}", app.handleForum)
+	f.HandleFunc("/{id:[0-9]+}", app.handleForum).Methods("GET")
+	f.HandleFunc("/{id:[0-9]+}/page/{page:[0-9]+}", app.handleForum).Methods("GET")
 	f.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddTopic, "/forum")).Methods("GET")
 	f.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSaveTopic, "/forum")).Methods("POST")
 
 	t := r.PathPrefix("/topic").Subrouter()
-	t.HandleFunc("/{id:[0-9]+}", app.handleTopic)
-	t.HandleFunc("/{id:[0-9]+}/page/{page:[0-9]+}", app.handleTopic)
+	t.HandleFunc("/{id:[0-9]+}", app.handleTopic).Methods("GET")
+	t.HandleFunc("/{id:[0-9]+}/page/{page:[0-9]+}", app.handleTopic).Methods("GET")
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleAddPost, "/topic")).Methods("GET")
 	t.HandleFunc("/{id:[0-9]+}/add", app.handleLoginRequired(app.handleSavePost, "/topic")).Methods("POST")
 	t.HandleFunc("/{id:[0-9]+}/delete", app.handleLoginRequired(app.handleDeletePost, "/topic")).Methods("POST")
