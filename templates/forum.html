@@ -1,13 +1,13 @@
 {{template "header.html" .}}
 		<div class="row">
-			<div class="col-md-10">
+			<div class="col-xs-10">
 				<span class="h1">{{.forum.Title}} <small>{{.forum.Description}}</small></span>
 			</div>
 		</div>
 
 		{{if .user}}
 		<div class="row topBuffer">
-			<div class="col-md-10">
+			<div class="col-xs-10">
 				<a class="btn btn-primary" role="button"href="/forum/{{.forum.Id}}/add">Add topic</a>
 			</div>
 		</div>
@@ -15,23 +15,23 @@
 
 		{{range $t := .topics}}
 		<div class="row item topBuffer">
-			<div class="col-md-10">
+			<div class="col-xs-10">
 				<span class="h2"><a href="/topic/{{$t.Id}}">{{$t.Title}}</a>
 						<small>{{$t.Description}}</small></span>
 			</div>
-			<div class="col-md-2">
+			<div class="col-xs-2">
 					<span class="h4">{{$t.PostCount}} posts</span>
 			</div>
 		</div>
 		{{end}}
 
 		<div class="row">
-			<div class="col-md-8">
+			<div class="col-xs-8">
 				{{if .user}}
 				<a class="btn btn-primary topBuffer" role="button" href="/forum/{{.forum.Id}}/add">Add topic</a>
 				{{end}}
 			</div>
-			<div class="col-md-4">
+			<div class="col-xs-4">
 				<nav class="pageCount">
 					<ul class="pagination">
 						{{range .pageIndicies}}
