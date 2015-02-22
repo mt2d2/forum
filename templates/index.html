@@ -1,11 +1,11 @@
 {{template "header.html" .}}
 			{{range $f := .forums}}
 			<div class="row item">
-				<div class="col-xs-9">
+				<div class="col-md-9">
 					<span class="h1"><a href="forum/{{$f.Id}}">{{$f.Title}}</a>
 					<small>{{$f.Description}}</small></span>
 				</div>
-				<div class="col-xs-3 topBuffer bottomBuffer">
+				<div class="col-md-3 topBuffer bottomBuffer">
 					<span class="h3">{{$f.TopicCount}} topics, {{$f.PostCount}} posts</span>
 				</div>
 			</div>
