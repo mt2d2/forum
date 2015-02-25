@@ -11,15 +11,28 @@ div.item div h1, h2, h3, h4 {
   /*background: #eee;*/
 }
 
-.post {
+.posts {
+  padding-left: 15px;
+  padding-right: 15px;
+  border: 1px solid transparent;
+  border-color: #e7e7e7;
+  border-radius: 4px;
+
   word-wrap: break-word;
   position: relative;
+}
+
+.posts .postRow:nth-child(odd)  {
+  background-color: #f8f8f8;
+}
+
+.postRow {
+  padding: 15px;
 }
 
 .pageCount {
   text-align: right;
 }
-
 
 .topBuffer {
   margin-top: 15px;

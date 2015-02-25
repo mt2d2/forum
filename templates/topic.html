@@ -34,39 +34,40 @@ Delete</button>
 		</div>
 		{{end}}
 
-		{{range $p := .posts}}
-		<div class="row topBuffer">
-			<div class="col-xs-2">
-				<div class="row">
-					<div class="col-xs-12">
-						{{$p.User.Username}}
+		<div class="posts topBuffer">
+			{{range $p := .posts}}
+			<div class="row postRow">
+				<div class="col-xs-2">
+					<div class="row">
+						<div class="col-xs-12">
+							{{$p.User.Username}}
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+							<small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small>
+						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-xs-12">
-						<small>{{$p.Published.Format "1/2/06 03:04 pm" }}</small>
+				<div class="col-xs-10">
+					{{if $.user}}
+					{{if eq $.user.Id $p.User.Id}}
+					<div class="deletePost">
+						<form action ="/topic/{{$.topic.Id}}/delete" method="POST">
+							<input type="hidden" name="TopicId" value="{{$.topic.Id}}" />
+							<input type="hidden" name="PostId" value="{{$p.Id}}" />
+							<button type="button" class="close" name="removePost" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</form>
 					</div>
+					{{end}}
+					{{end}}
+					<div>{{$p.Text | markDown}}</div>
 				</div>
-
 			</div>
-			<div class="col-xs-10 post">
-				{{if $.user}}
-				{{if eq $.user.Id $p.User.Id}}
-				<div class="deletePost">
-					<form action ="/topic/{{$.topic.Id}}/delete" method="POST">
-						<input type="hidden" name="TopicId" value="{{$.topic.Id}}" />
-						<input type="hidden" name="PostId" value="{{$p.Id}}" />
-						<button type="button" class="close" name="removePost" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</form>
-				</div>
-				{{end}}
-				{{end}}
-				<div>{{$p.Text | markDown}}</div>
-			</div>
+			{{end}}
 		</div>
-		{{end}}
 
 		<div class="row">
 			<div class="col-xs-8">
