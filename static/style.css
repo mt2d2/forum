@@ -27,7 +27,8 @@ div.item div h1, h2, h3, h4 {
 }
 
 .postRow {
-  padding: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 .pageCount {
