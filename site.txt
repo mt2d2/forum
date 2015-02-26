@@ -1,0 +1,9 @@
+http://localhost:8080/
+http://localhost:8080/forum/1
+http://localhost:8080/topic/1
+http://localhost:8080/topic/4
+http://localhost:8080/forum/2
+http://localhost:8080/topic/2
+http://localhost:8080/topic/3
+http://localhost:8080/user/login
+http://localhost:8080/user/add
