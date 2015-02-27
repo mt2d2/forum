@@ -11,10 +11,13 @@ type Topic struct {
 	Description string
 	ForumId     int
 	PostCount   int
+
+	// relations
+	Forum *Forum
 }
 
 func NewTopic() *Topic {
-	return &Topic{-1, "", "", -1, -1}
+	return &Topic{-1, "", "", -1, -1, nil}
 }
 
 func ValidateTopic(db *sql.DB, topic *Topic) (ok bool, errs []error) {
@@ -61,12 +64,17 @@ func FindOneTopic(db *sql.DB, reqId string) (Topic, error) {
 		return Topic{}, errors.New("could not query for topic with id " + reqId)
 	}
 
+	forum, err := FindOneForum(db, strconv.Itoa(forumId))
+	if err != nil {
+		return Topic{}, err
+	}
+
 	postCount, err := postCount(db, reqId)
 	if err != nil {
 		return Topic{}, err
 	}
 
-	return Topic{id, title, description, forumId, postCount}, nil
+	return Topic{id, title, description, forumId, postCount, &forum}, nil
 }
 
 func postCount(db *sql.DB, reqId string) (int, error) {
@@ -107,7 +115,7 @@ func FindTopics(db *sql.DB, reqId string, limit int, offset int) ([]Topic, error
 			return nil, errors.New("could not could topics for forum with id " + strconv.Itoa(id))
 		}
 
-		topics = append(topics, Topic{id, title, description, forumId, postCount})
+		topics = append(topics, Topic{id, title, description, forumId, postCount, nil})
 	}
 
 	return topics, nil

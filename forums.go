@@ -24,15 +24,9 @@ import "github.com/mt2d2/forum/model"
 
 const (
 	DATABASE_FILE = "forums.db"
-	LIMIT_POSTS = 10
-	LIMIT_TOPICS = 10
+	LIMIT_POSTS   = 10
+	LIMIT_TOPICS  = 10
 )
-
-type App struct {
-	templates *template.Template
-	db        *sql.DB
-	sessions  *sessions.CookieStore
-}
 
 func convertToMarkdown(markdown string) template.HTML {
 	unsafe := blackfriday.MarkdownCommon([]byte(markdown))
@@ -44,6 +38,15 @@ func convertToMarkdown(markdown string) template.HTML {
 
 	html := policy.SanitizeBytes(unsafe)
 	return template.HTML(html)
+}
+
+type BreadCrumb struct{ URL, Title string }
+
+type App struct {
+	templates   *template.Template
+	db          *sql.DB
+	sessions    *sessions.CookieStore
+	breadCrumbs []BreadCrumb
 }
 
 func newApp() *App {
@@ -70,11 +73,23 @@ func newApp() *App {
 
 	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
-	return &App{templates, db, sessionStore}
+	breadCrumbs := make([]BreadCrumb, 0, 1)
+	breadCrumbs = append(breadCrumbs, BreadCrumb{"/", "Index"})
+	return &App{templates, db, sessionStore, breadCrumbs}
 }
 
 func (app *App) destroy() {
 	app.db.Close()
+}
+
+func (app *App) addBreadCrumb(url, title string) {
+	app.breadCrumbs = append(app.breadCrumbs, BreadCrumb{url, title})
+}
+
+func (app *App) useBreadCrumbs() *[]BreadCrumb {
+	ret := app.breadCrumbs
+	app.breadCrumbs = app.breadCrumbs[:1]
+	return &ret
 }
 
 func (app *App) addErrorFlashes(w http.ResponseWriter, r *http.Request, errs []error) {
@@ -100,6 +115,7 @@ func (app *App) addFlash(w http.ResponseWriter, r *http.Request, content interfa
 func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
 	session, _ := app.sessions.Get(r, "forumSession")
 
+	data["breadCrumbs"] = app.useBreadCrumbs()
 	data["errorFlashes"] = session.Flashes("error")
 	data["successFlashes"] = session.Flashes("success")
 
@@ -153,11 +169,13 @@ func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 		pageIndicies[i] = i + 1
 	}
 
-	topics, err := model.FindTopics(app.db, id, LIMIT_TOPICS, pageOffset * LIMIT_TOPICS)
+	topics, err := model.FindTopics(app.db, id, LIMIT_TOPICS, pageOffset*LIMIT_TOPICS)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	app.addBreadCrumb("/forum/"+strconv.Itoa(forum.Id), forum.Title)
 
 	results := make(map[string]interface{})
 	results["forum"] = forum
@@ -190,11 +208,14 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 		pageIndicies[i] = i + 1
 	}
 
-	posts, err := model.FindPosts(app.db, id, LIMIT_POSTS, pageOffset * LIMIT_POSTS)
+	posts, err := model.FindPosts(app.db, id, LIMIT_POSTS, pageOffset*LIMIT_POSTS)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	app.addBreadCrumb("/forum/" + strconv.Itoa(topic.Forum.Id), topic.Forum.Title)
+	app.addBreadCrumb("/topic/"+strconv.Itoa(topic.Id), topic.Title)
 
 	results := make(map[string]interface{})
 	results["topic"] = topic

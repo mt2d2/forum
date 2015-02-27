@@ -58,7 +58,12 @@
 		</div>
 		{{end}}
 
-		<!-- <div>
+		<div>
 			<ol class="breadcrumb">
+				{{if .breadCrumbs}}
+				{{range $b := .breadCrumbs}}
+				<li><a href="{{$b.URL}}">{{$b.Title}}</a></li>
+				{{end}}
+				{{end}}
 			</ol>
-		</div> -->
+		</div>
