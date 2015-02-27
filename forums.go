@@ -336,6 +336,8 @@ func (app *App) handleDeletePost(w http.ResponseWriter, req *http.Request) {
 }
 
 func (app *App) handleRegister(w http.ResponseWriter, req *http.Request) {
+	app.addBreadCrumb("/user/add", "Register")
+
 	results := make(map[string]interface{})
 	app.renderTemplate(w, req, "register", results)
 }
@@ -374,6 +376,7 @@ func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
 }
 
 func (app *App) handleLogin(w http.ResponseWriter, req *http.Request) {
+	app.addBreadCrumb("/user/login", "Login")
 	results := make(map[string]interface{})
 	results["Referer"] = req.Referer()
 	app.renderTemplate(w, req, "login", results)
