@@ -23,9 +23,9 @@ import "github.com/gorilla/sessions"
 import "github.com/mt2d2/forum/model"
 
 const (
-	DATABASE_FILE = "forums.db"
-	LIMIT_POSTS   = 10
-	LIMIT_TOPICS  = 10
+	databaseFile = "forums.db"
+	limitPosts   = 10
+	limitTopics  = 10
 )
 
 func convertToMarkdown(markdown string) template.HTML {
@@ -40,17 +40,17 @@ func convertToMarkdown(markdown string) template.HTML {
 	return template.HTML(html)
 }
 
-type BreadCrumb struct{ URL, Title string }
+type breadCrumb struct{ URL, Title string }
 
-type App struct {
+type app struct {
 	templates   *template.Template
 	db          *sql.DB
 	sessions    *sessions.CookieStore
-	breadCrumbs []BreadCrumb
+	breadCrumbs []breadCrumb
 }
 
-func newApp() *App {
-	db, err := sql.Open("sqlite3", DATABASE_FILE)
+func newApp() *app {
+	db, err := sql.Open("sqlite3", databaseFile)
 	if err != nil {
 		panic("error opening database")
 	}
@@ -73,54 +73,54 @@ func newApp() *App {
 
 	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
-	breadCrumbs := make([]BreadCrumb, 0, 1)
-	breadCrumbs = append(breadCrumbs, BreadCrumb{"/", "Index"})
-	return &App{templates, db, sessionStore, breadCrumbs}
+	breadCrumbs := make([]breadCrumb, 0, 1)
+	breadCrumbs = append(breadCrumbs, breadCrumb{"/", "Index"})
+	return &app{templates, db, sessionStore, breadCrumbs}
 }
 
-func (app *App) destroy() {
+func (app *app) destroy() {
 	app.db.Close()
 }
 
-func (app *App) addBreadCrumb(url, title string) {
-	app.breadCrumbs = append(app.breadCrumbs, BreadCrumb{url, title})
+func (app *app) addBreadCrumb(url, title string) {
+	app.breadCrumbs = append(app.breadCrumbs, breadCrumb{url, title})
 }
 
-func (app *App) useBreadCrumbs() *[]BreadCrumb {
+func (app *app) useBreadCrumbs() *[]breadCrumb {
 	ret := app.breadCrumbs
 	app.breadCrumbs = app.breadCrumbs[:1]
 	return &ret
 }
 
-func (app *App) addErrorFlashes(w http.ResponseWriter, r *http.Request, errs []error) {
+func (app *app) addErrorFlashes(w http.ResponseWriter, r *http.Request, errs []error) {
 	for _, err := range errs {
 		app.addErrorFlash(w, r, err)
 	}
 }
 
-func (app *App) addErrorFlash(w http.ResponseWriter, r *http.Request, error error) {
+func (app *app) addErrorFlash(w http.ResponseWriter, r *http.Request, error error) {
 	app.addFlash(w, r, error.Error(), "error")
 }
 
-func (app *App) addSuccessFlash(w http.ResponseWriter, r *http.Request, str string) {
+func (app *app) addSuccessFlash(w http.ResponseWriter, r *http.Request, str string) {
 	app.addFlash(w, r, str, "success")
 }
 
-func (app *App) addFlash(w http.ResponseWriter, r *http.Request, content interface{}, key string) {
+func (app *app) addFlash(w http.ResponseWriter, r *http.Request, content interface{}, key string) {
 	session, _ := app.sessions.Get(r, "forumSession")
 	session.AddFlash(content, key)
 	session.Save(r, w)
 }
 
-func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
+func (app *app) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data map[string]interface{}) {
 	session, _ := app.sessions.Get(r, "forumSession")
 
 	data["breadCrumbs"] = app.useBreadCrumbs()
 	data["errorFlashes"] = session.Flashes("error")
 	data["successFlashes"] = session.Flashes("success")
 
-	if userId, ok := session.Values["user_id"].(int); ok {
-		user, err := model.FindOneUserById(app.db, userId)
+	if userID, ok := session.Values["user_id"].(int); ok {
+		user, err := model.FindOneUserById(app.db, userID)
 		if err == nil {
 			data["user"] = user
 		}
@@ -135,7 +135,7 @@ func (app *App) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl stri
 	}
 }
 
-func (app *App) handleIndex(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleIndex(w http.ResponseWriter, req *http.Request) {
 	forums, err := model.FindForums(app.db)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -148,7 +148,7 @@ func (app *App) handleIndex(w http.ResponseWriter, req *http.Request) {
 	app.renderTemplate(w, req, "index", results)
 }
 
-func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleForum(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
 	pageOffset := 0
@@ -163,13 +163,13 @@ func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	numberOfPages := int(math.Ceil(float64(forum.TopicCount) / float64(LIMIT_TOPICS)))
+	numberOfPages := int(math.Ceil(float64(forum.TopicCount) / float64(limitTopics)))
 	pageIndicies := make([]int, numberOfPages)
 	for i := 0; i < numberOfPages; i++ {
 		pageIndicies[i] = i + 1
 	}
 
-	topics, err := model.FindTopics(app.db, id, LIMIT_TOPICS, pageOffset*LIMIT_TOPICS)
+	topics, err := model.FindTopics(app.db, id, limitTopics, pageOffset*limitTopics)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -186,7 +186,7 @@ func (app *App) handleForum(w http.ResponseWriter, req *http.Request) {
 	app.renderTemplate(w, req, "forum", results)
 }
 
-func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleTopic(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
 	pageOffset := 0
@@ -202,13 +202,13 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	numberOfPages := int(math.Ceil(float64(topic.PostCount) / float64(LIMIT_POSTS)))
+	numberOfPages := int(math.Ceil(float64(topic.PostCount) / float64(limitPosts)))
 	pageIndicies := make([]int, numberOfPages)
 	for i := 0; i < numberOfPages; i++ {
 		pageIndicies[i] = i + 1
 	}
 
-	posts, err := model.FindPosts(app.db, id, LIMIT_POSTS, pageOffset*LIMIT_POSTS)
+	posts, err := model.FindPosts(app.db, id, limitPosts, pageOffset*limitPosts)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -226,7 +226,7 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 	app.renderTemplate(w, req, "topic", results)
 }
 
-func (app *App) handleAddTopic(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleAddTopic(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
 
@@ -235,7 +235,7 @@ func (app *App) handleAddTopic(w http.ResponseWriter, req *http.Request) {
 	app.renderTemplate(w, req, "addTopic", results)
 }
 
-func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	topic := model.NewTopic()
@@ -261,7 +261,7 @@ func (app *App) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/forum/"+req.PostFormValue("ForumId"), http.StatusFound)
 }
 
-func (app *App) handleAddPost(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleAddPost(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
 
@@ -270,7 +270,7 @@ func (app *App) handleAddPost(w http.ResponseWriter, req *http.Request) {
 	app.renderTemplate(w, req, "addPost", results)
 }
 
-func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleSavePost(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	post := model.NewPost()
@@ -282,8 +282,8 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 	}
 
 	session, _ := app.sessions.Get(req, "forumSession")
-	if userId, ok := session.Values["user_id"].(int); ok {
-		post.UserId = userId
+	if userID, ok := session.Values["user_id"].(int); ok {
+		post.UserId = userID
 	}
 
 	ok, errors := model.ValidatePost(app.db, post)
@@ -302,12 +302,12 @@ func (app *App) handleSavePost(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId"), http.StatusFound)
 }
 
-func (app *App) handleDeletePost(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleDeletePost(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	session, _ := app.sessions.Get(req, "forumSession")
-	if userId, ok := session.Values["user_id"].(int); ok {
-		user, err := model.FindOneUserById(app.db, userId)
+	if userID, ok := session.Values["user_id"].(int); ok {
+		user, err := model.FindOneUserById(app.db, userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -327,22 +327,20 @@ func (app *App) handleDeletePost(w http.ResponseWriter, req *http.Request) {
 
 		model.DeletePost(app.db, post.Id)
 		http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId"), http.StatusFound)
-		return
 	} else {
 		app.addErrorFlash(w, req, errors.New("Must be logged in!"))
 		http.Redirect(w, req, "/", http.StatusFound)
-		return
 	}
 }
 
-func (app *App) handleRegister(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleRegister(w http.ResponseWriter, req *http.Request) {
 	app.addBreadCrumb("/user/add", "Register")
 
 	results := make(map[string]interface{})
 	app.renderTemplate(w, req, "register", results)
 }
 
-func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
+func (app *app) saveRegister(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	user := model.NewUser()
@@ -375,14 +373,14 @@ func (app *App) saveRegister(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/", http.StatusFound)
 }
 
-func (app *App) handleLogin(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleLogin(w http.ResponseWriter, req *http.Request) {
 	app.addBreadCrumb("/user/login", "Login")
 	results := make(map[string]interface{})
 	results["Referer"] = req.Referer()
 	app.renderTemplate(w, req, "login", results)
 }
 
-func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
+func (app *app) saveLogin(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	username := req.PostFormValue("Username")
@@ -424,7 +422,7 @@ func (app *App) saveLogin(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, toRedirect, http.StatusFound)
 }
 
-func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
+func (app *app) handleLogout(w http.ResponseWriter, req *http.Request) {
 	session, _ := app.sessions.Get(req, "forumSession")
 	delete(session.Values, "user_id")
 	session.Save(req, w)
@@ -439,7 +437,7 @@ func (app *App) handleLogout(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, toRedirect, http.StatusFound)
 }
 
-func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.Request), pathToRedirect string) func(http.ResponseWriter, *http.Request) {
+func (app *app) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.Request), pathToRedirect string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		session, _ := app.sessions.Get(req, "forumSession")
 		if _, ok := session.Values["user_id"]; !ok {
@@ -458,16 +456,16 @@ func (app *App) handleLoginRequired(nextHandler func(http.ResponseWriter, *http.
 }
 
 func backup() {
-	src, err := os.Open(DATABASE_FILE)
+	src, err := os.Open(databaseFile)
 	defer src.Close()
 	if err != nil {
 		panic("could not open database to backup")
 	}
 
-	dest, err := os.Create("backup/" + DATABASE_FILE)
+	dest, err := os.Create("backup/" + databaseFile)
 	defer dest.Close()
 	if err != nil {
-		panic("could not open backup/" + DATABASE_FILE)
+		panic("could not open backup/" + databaseFile)
 	}
 
 	io.Copy(dest, src)
