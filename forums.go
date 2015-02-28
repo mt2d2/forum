@@ -214,7 +214,7 @@ func (app *App) handleTopic(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	app.addBreadCrumb("/forum/" + strconv.Itoa(topic.Forum.Id), topic.Forum.Title)
+	app.addBreadCrumb("/forum/"+strconv.Itoa(topic.Forum.Id), topic.Forum.Title)
 	app.addBreadCrumb("/topic/"+strconv.Itoa(topic.Id), topic.Title)
 
 	results := make(map[string]interface{})
