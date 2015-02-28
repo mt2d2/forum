@@ -504,7 +504,7 @@ func main() {
 	u.HandleFunc("/logout", app.handleLogout)
 
 	http.Handle("/", httpgzip.NewHandler(r))
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("localhost:8080", nil)
 
 	app.destroy()
 }
