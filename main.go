@@ -1,6 +1,7 @@
 package main
 
 import (
+	"compress/gzip"
 	"errors"
 	"io"
 	"log"
@@ -30,15 +31,20 @@ func backup() error {
 		return errors.New("could not create backup")
 	}
 
-	destFile := path.Join("backup", databaseFile)
+	destFile := path.Join("backup", databaseFile+".gz")
 	dest, err := os.Create(destFile)
 	defer dest.Close()
 	if err != nil {
 		return err
 	}
 
-	io.Copy(dest, src)
-	return nil
+	gzipWriter := gzip.NewWriter(dest)
+	_, err = io.Copy(gzipWriter, src)
+	if err != nil {
+		return err
+	}
+
+	return gzipWriter.Close()
 }
 
 func main() {
