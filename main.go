@@ -52,9 +52,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	log.Println("backup complete")
 
 	app := newApp()
 	defer app.destroy()
+	log.Println("database opened")
 
 	r := mux.NewRouter()
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -82,5 +84,8 @@ func main() {
 	u.HandleFunc("/logout", app.handleLogout)
 
 	http.Handle("/", httpgzip.NewHandler(r))
-	log.Fatal(http.ListenAndServe("localhost:8080", nil))
+
+	host := "localhost:8080"
+	log.Printf("Serving on %s\n", host)
+	log.Fatal(http.ListenAndServe(host, nil))
 }
