@@ -9,6 +9,19 @@ import (
 	"github.com/mt2d2/forum/model"
 )
 
+func (app *app) handleIndex(w http.ResponseWriter, req *http.Request) {
+	forums, err := model.FindForums(app.db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	results := make(map[string]interface{})
+	results["forums"] = forums
+
+	app.renderTemplate(w, req, "index", results)
+}
+
 func (app *app) handleForum(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
