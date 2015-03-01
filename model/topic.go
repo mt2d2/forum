@@ -52,7 +52,7 @@ func SaveTopic(db *sql.DB, topic *Topic) error {
 	return err
 }
 
-func FindOneTopic(db *sql.DB, reqId string) (Topic, error) {
+func FindOneTopic(db *sql.DB, reqId string) (*Topic, error) {
 	var (
 		id          int
 		title       string
@@ -63,20 +63,20 @@ func FindOneTopic(db *sql.DB, reqId string) (Topic, error) {
 	row := db.QueryRow("SELECT * FROM topics WHERE id = ?", reqId)
 	err := row.Scan(&id, &title, &description, &forumId)
 	if err != nil {
-		return Topic{}, errors.New("could not query for topic with id " + reqId)
+		return &Topic{}, errors.New("could not query for topic with id " + reqId)
 	}
 
 	forum, err := FindOneForum(db, strconv.Itoa(forumId))
 	if err != nil {
-		return Topic{}, err
+		return &Topic{}, err
 	}
 
 	postCount, err := postCount(db, reqId)
 	if err != nil {
-		return Topic{}, err
+		return &Topic{}, err
 	}
 
-	return Topic{id, title, description, forumId, postCount, &forum}, nil
+	return &Topic{id, title, description, forumId, postCount, &forum}, nil
 }
 
 func postCount(db *sql.DB, reqId string) (int, error) {

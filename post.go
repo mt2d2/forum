@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/Schema"
 	"github.com/gorilla/mux"
@@ -47,7 +48,9 @@ func (app *app) handleSavePost(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId"), http.StatusFound)
+	topic, err := model.FindOneTopic(app.db, strconv.Itoa(post.TopicId))
+
+	http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId")+"/page/"+strconv.Itoa(numberOfTopicPages(topic)), http.StatusFound)
 }
 
 func (app *app) handleDeletePost(w http.ResponseWriter, req *http.Request) {
