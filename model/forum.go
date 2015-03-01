@@ -1,8 +1,10 @@
 package model
 
-import "errors"
-import "database/sql"
-import "strconv"
+import (
+	"database/sql"
+	"errors"
+	"strconv"
+)
 
 type Forum struct {
 	Id          int

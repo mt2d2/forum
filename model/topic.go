@@ -1,9 +1,11 @@
 package model
 
-import "errors"
-import "database/sql"
-import "strconv"
-import "strings"
+import (
+	"database/sql"
+	"errors"
+	"strconv"
+	"strings"
+)
 
 type Topic struct {
 	Id          int

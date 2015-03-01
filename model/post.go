@@ -1,10 +1,12 @@
 package model
 
-import "errors"
-import "database/sql"
-import "time"
-import "strconv"
-import "strings"
+import (
+	"database/sql"
+	"errors"
+	"strconv"
+	"strings"
+	"time"
+)
 
 type Post struct {
 	Id        int

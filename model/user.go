@@ -1,9 +1,11 @@
 package model
 
-import "errors"
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
 
-import "code.google.com/p/go.crypto/bcrypt"
+	"code.google.com/p/go.crypto/bcrypt"
+)
 
 type User struct {
 	Id           int
