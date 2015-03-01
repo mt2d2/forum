@@ -38,6 +38,15 @@
 	</nav>
 
 	<div class="container-fluid">
+		<div>
+			<ol class="breadcrumb">
+				{{if .breadCrumbs}}
+				{{range $b := .breadCrumbs}}
+				<li><a href="{{$b.URL}}">{{$b.Title}}</a></li>
+				{{end}}
+				{{end}}
+			</ol>
+		</div>
 
 		{{if .errorFlashes}}
 		<div class="alert alert-danger" role="alert">
@@ -57,13 +66,3 @@
 			{{range $i, $e := .successFlashes}}{{if $i}}, {{end}}{{$e}}{{end}}
 		</div>
 		{{end}}
-
-		<div>
-			<ol class="breadcrumb">
-				{{if .breadCrumbs}}
-				{{range $b := .breadCrumbs}}
-				<li><a href="{{$b.URL}}">{{$b.Title}}</a></li>
-				{{end}}
-				{{end}}
-			</ol>
-		</div>
