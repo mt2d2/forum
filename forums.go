@@ -1,26 +1,29 @@
 package main
 
-import "errors"
-import "html/template"
-import "io"
-import "net/http"
-import "math"
-import "os"
-import "regexp"
-import "strconv"
-import "strings"
-import "database/sql"
-import _ "github.com/mattn/go-sqlite3"
+import (
+	"database/sql"
+	"errors"
+	"html/template"
+	"io"
+	"math"
+	"net/http"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
 
-import "github.com/microcosm-cc/bluemonday"
-import "github.com/russross/blackfriday"
-import "github.com/daaku/go.httpgzip"
-import "github.com/gorilla/mux"
-import "github.com/gorilla/Schema"
-import "github.com/gorilla/securecookie"
-import "github.com/gorilla/sessions"
+	_ "github.com/mattn/go-sqlite3"
 
-import "github.com/mt2d2/forum/model"
+	"github.com/daaku/go.httpgzip"
+	"github.com/gorilla/Schema"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/securecookie"
+	"github.com/gorilla/sessions"
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/russross/blackfriday"
+
+	"github.com/mt2d2/forum/model"
+)
 
 const (
 	databaseFile = "forums.db"
