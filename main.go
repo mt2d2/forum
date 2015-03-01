@@ -3,6 +3,7 @@ package main
 import (
 	"compress/gzip"
 	"errors"
+	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -47,7 +48,11 @@ func backup() error {
 	return gzipWriter.Close()
 }
 
+var listen = flag.String("listen", "localhost:8080", "host and port to listen on")
+
 func main() {
+	flag.Parse()
+
 	err := backup()
 	if err != nil {
 		panic(err)
@@ -85,7 +90,6 @@ func main() {
 
 	http.Handle("/", httpgzip.NewHandler(r))
 
-	host := "localhost:8080"
-	log.Printf("Serving on %s\n", host)
-	log.Fatal(http.ListenAndServe(host, nil))
+	log.Printf("Serving on %s\n", *listen)
+	log.Fatal(http.ListenAndServe(*listen, nil))
 }
