@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/daaku/go.httpgzip"
 	"github.com/gorilla/mux"
@@ -16,24 +18,34 @@ const (
 	limitTopics  = 10
 )
 
-func backup() {
+func backup() error {
 	src, err := os.Open(databaseFile)
 	defer src.Close()
 	if err != nil {
-		panic("could not open database to backup")
+		return errors.New("could not open database to backup")
 	}
 
-	dest, err := os.Create("backup/" + databaseFile)
+	err = os.MkdirAll("backup", 0755)
+	if err != nil {
+		return errors.New("could not create backup")
+	}
+
+	destFile := path.Join("backup", databaseFile)
+	dest, err := os.Create(destFile)
 	defer dest.Close()
 	if err != nil {
-		panic("could not open backup/" + databaseFile)
+		return err
 	}
 
 	io.Copy(dest, src)
+	return nil
 }
 
 func main() {
-	backup()
+	err := backup()
+	if err != nil {
+		panic(err)
+	}
 
 	app := newApp()
 	defer app.destroy()
