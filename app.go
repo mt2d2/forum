@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"html/template"
+	"log"
 	"net/http"
 	"regexp"
 
@@ -39,7 +40,7 @@ type app struct {
 func newApp() *app {
 	db, err := sql.Open("sqlite3", databaseFile)
 	if err != nil {
-		panic("error opening database")
+		log.Fatal(err)
 	}
 
 	templates, err := template.New("").Funcs(template.FuncMap{"markDown": convertToMarkdown}).ParseFiles(
