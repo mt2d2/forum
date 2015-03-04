@@ -10,7 +10,7 @@ import (
 	"github.com/mt2d2/forum/model"
 )
 
-func numberOfTopicPages(topic *model.Topic) int {
+func numberOfTopicPages(topic model.Topic) int {
 	return int(math.Ceil(float64(topic.PostCount) / float64(limitPosts)))
 }
 
@@ -30,7 +30,7 @@ func (app *app) handleTopic(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	numberOfPages := numberOfTopicPages(topic)
+	numberOfPages := numberOfTopicPages(*topic)
 	pageIndicies := make([]int, numberOfPages)
 	for i := 0; i < numberOfPages; i++ {
 		pageIndicies[i] = i + 1

@@ -49,8 +49,12 @@ func (app *app) handleSavePost(w http.ResponseWriter, req *http.Request) {
 	}
 
 	topic, err := model.FindOneTopic(app.db, strconv.Itoa(post.TopicId))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId")+"/page/"+strconv.Itoa(numberOfTopicPages(topic)), http.StatusFound)
+	http.Redirect(w, req, "/topic/"+req.PostFormValue("TopicId")+"/page/"+strconv.Itoa(numberOfTopicPages(*topic)), http.StatusFound)
 }
 
 func (app *app) handleDeletePost(w http.ResponseWriter, req *http.Request) {
