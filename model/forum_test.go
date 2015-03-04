@@ -12,7 +12,7 @@ func mockForum1() *Forum {
 		Id:          1,
 		Title:       "test",
 		Description: "tester forum",
-		TopicCount:  2,
+		TopicCount:  3,
 		PostCount:   12,
 	}
 }

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"math"
 	"reflect"
 	"testing"
 )
@@ -47,5 +48,28 @@ func TestFindOneTopic(t *testing.T) {
 
 	if topic.PostCount != 11 {
 		t.Error("wrong post count")
+	}
+}
+
+func TestFindTopicsNoLimit(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	topicsForum1, err := FindTopics(db, "1", math.MaxInt64, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(topicsForum1) != 3 {
+		t.Error("wrong number of topics")
+	}
+
+	topicsForum2, err := FindTopics(db, "2", math.MaxInt64, 0)
+
+	if len(topicsForum2) != 2 {
+		t.Error("wrong number of topics")
 	}
 }
