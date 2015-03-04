@@ -40,7 +40,7 @@ type app struct {
 func newApp() *app {
 	db, err := sql.Open("sqlite3", databaseFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 
 	templates, err := template.New("").Funcs(template.FuncMap{"markDown": convertToMarkdown}).ParseFiles(
