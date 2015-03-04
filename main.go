@@ -55,7 +55,7 @@ func main() {
 
 	err := backup()
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	log.Println("backup complete")
 
