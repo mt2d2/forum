@@ -1,15 +1,11 @@
 package model
 
 import (
-	"database/sql"
-	"os"
 	"reflect"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
-var db *sql.DB
 
 func mockForum1() *Forum {
 	return &Forum{
@@ -32,6 +28,12 @@ func mockForum2() *Forum {
 }
 
 func TestFindOneForum(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	forum1, err := FindOneForum(db, "1")
 	if err != nil {
 		t.Fatal(err)
@@ -52,6 +54,12 @@ func TestFindOneForum(t *testing.T) {
 }
 
 func TestFindForums(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	forums, err := FindForums(db)
 	if err != nil {
 		t.Fatal(err)
@@ -68,20 +76,4 @@ func TestFindForums(t *testing.T) {
 	if !reflect.DeepEqual(forums[1], *mockForum2()) {
 		t.Error("forum does not equal mock forum")
 	}
-}
-
-func TestMain(m *testing.M) {
-	// :memory: databases aren't shared amongst connections
-	// https://groups.google.com/forum/#!topic/golang-nuts/AYZl1lNxCfA
-	if ldb, err := sql.Open("sqlite3", "file:dummy.db?mode=memory&cache=shared"); err == nil {
-		db = ldb
-	}
-	if _, err := db.Exec(MockupDB); err != nil {
-		panic(err)
-	}
-
-	ret := m.Run()
-
-	db.Close()
-	os.Exit(ret)
 }

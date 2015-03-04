@@ -1,5 +1,7 @@
 package model
 
+import "database/sql"
+
 // Mockup database for testing
 const MockupDB = `
 PRAGMA foreign_keys=OFF;
@@ -58,3 +60,18 @@ INSERT INTO "posts" VALUES(29,'','2014-11-04 05:56:58.608376074',2,1);
 INSERT INTO "posts" VALUES(30,'blah blah blah blah','2014-11-04 06:08:47.772019858',4,1);
 COMMIT;
 `
+
+// GetMockupDB gets a shared, cached sqlite in memory database with the mockup data for testing.
+func GetMockupDB() (*sql.DB, error) {
+	// :memory: databases aren't shared amongst connections
+	// https://groups.google.com/forum/#!topic/golang-nuts/AYZl1lNxCfA
+	db, err := sql.Open("sqlite3", "file:dummy.db?mode=memory&cache=shared")
+	if err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec(MockupDB); err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
