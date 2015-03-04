@@ -51,6 +51,46 @@ func TestFindOneTopic(t *testing.T) {
 	}
 }
 
+func TestSaveTopic(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	newTopic := &Topic{
+		Id:          -1,
+		Title:       "NEW TITLE",
+		Description: "NEW DESC",
+		ForumId:     1,
+		PostCount:   -1,
+		Forum:       nil,
+	}
+
+	topicsForum1, err := FindTopics(db, "1", math.MaxInt64, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(topicsForum1) != 3 {
+		t.Error("wrong number of topics")
+	}
+
+	err = SaveTopic(db, newTopic)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	newTopicsForum1, err := FindTopics(db, "1", math.MaxInt64, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(newTopicsForum1) != 4 {
+		t.Error("wrong number of topics after insert")
+	}
+}
+
 func TestFindTopicsNoLimit(t *testing.T) {
 	db, err := GetMockupDB()
 	defer db.Close()
