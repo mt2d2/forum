@@ -66,3 +66,27 @@ func TestFindOneUserByUsername(t *testing.T) {
 		t.Error("wrong user")
 	}
 }
+
+func TestFindOneUserById(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userTest, err := FindOneUserById(db, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(userTest, *mockUserTest()) {
+		t.Error("wrong user")
+	}
+
+	userTester, err := FindOneUserById(db, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(userTester, *mockUserTester()) {
+		t.Error("wrong user")
+	}
+}
