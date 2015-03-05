@@ -70,7 +70,7 @@ func (app *app) saveLogin(w http.ResponseWriter, req *http.Request) {
 
 	invalidUserOrPassword := errors.New("Invalid username or password.")
 
-	user, err := model.FindOneUser(app.db, username)
+	user, err := model.FindOneUserByUsername(app.db, username)
 	if err != nil {
 		app.addErrorFlash(w, req, invalidUserOrPassword)
 		http.Redirect(w, req, "/user/login", http.StatusFound)

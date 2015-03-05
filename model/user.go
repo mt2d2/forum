@@ -63,7 +63,7 @@ func ValidateUser(db *sql.DB, user *User) (ok bool, errs []error) {
 		errs = append(errs, errors.New("Username must not be empty."))
 	}
 
-	_, err := FindOneUser(db, user.Username)
+	_, err := FindOneUserByUsername(db, user.Username)
 	if err == nil {
 		errs = append(errs, errors.New("Username must be unique."))
 	}
@@ -75,7 +75,7 @@ func ValidateUser(db *sql.DB, user *User) (ok bool, errs []error) {
 	return len(errs) == 0, errs
 }
 
-func FindOneUser(db *sql.DB, reqId string) (User, error) {
+func FindOneUserByUsername(db *sql.DB, reqId string) (User, error) {
 	var (
 		id           int
 		username     string
