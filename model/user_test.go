@@ -90,3 +90,33 @@ func TestFindOneUserById(t *testing.T) {
 		t.Error("wrong user")
 	}
 }
+
+func TestSaveUser(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user := mockUserTest()
+	user.PasswordHash = []byte{}
+
+	err = SaveUser(db, user)
+	if err == nil {
+		t.Error("a user must have a hashed password")
+	}
+
+	user = mockUserTest()
+	err = SaveUser(db, user)
+	if err != nil {
+		t.Fatal(err)
+	}
+	user.Id = 3
+	userTest, err := FindOneUserById(db, 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(userTest, *user) {
+		t.Error("wrong user")
+	}
+}
