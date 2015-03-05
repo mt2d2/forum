@@ -136,3 +136,28 @@ func TestFindTopicsSmallLimit(t *testing.T) {
 		t.Error("wrong number of topics")
 	}
 }
+
+func TestFindTopicsSmallOffset(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	topicsForum1, err := FindTopics(db, "1", math.MaxInt64, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(topicsForum1) != 2 {
+		t.Error("wrong number of topics")
+	}
+
+	if topicsForum1[0].Id != 4 {
+		t.Error("first retrieved topic has wrong ID")
+	}
+
+	if topicsForum1[1].Id != 5 {
+		t.Error("second retireved topics has wrong ID")
+	}
+}
