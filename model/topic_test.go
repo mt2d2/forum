@@ -113,3 +113,26 @@ func TestFindTopicsNoLimit(t *testing.T) {
 		t.Error("wrong number of topics")
 	}
 }
+
+func TestFindTopicsSmallLimit(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	topicsForum1, err := FindTopics(db, "1", 2, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(topicsForum1) != 2 {
+		t.Error("wrong number of topics")
+	}
+
+	topicsForum2, err := FindTopics(db, "2", 2, 0)
+
+	if len(topicsForum2) != 2 {
+		t.Error("wrong number of topics")
+	}
+}
