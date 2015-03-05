@@ -3,6 +3,7 @@ package model
 import (
 	"math"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -160,4 +161,51 @@ func TestFindTopicsSmallOffset(t *testing.T) {
 	if topicsForum1[1].Id != 5 {
 		t.Error("second retireved topics has wrong ID")
 	}
+}
+
+func TestValidateTopic(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	topic := NewTopic()
+
+	ok, errs := ValidateTopic(db, topic)
+	if ok || len(errs) != 2 {
+		t.Error("blank topic should not validate")
+	}
+
+	topic.Title = "Test"
+	ok, errs = ValidateTopic(db, topic)
+	if ok || len(errs) != 1 {
+		t.Error("still missing a proper forum id")
+	}
+
+	topic.ForumId = 255
+	ok, errs = ValidateTopic(db, topic)
+	if ok || len(errs) != 1 {
+		t.Error("invalid forum id")
+	}
+
+	topic.ForumId = 1
+	ok, errs = ValidateTopic(db, topic)
+	if !ok && len(errs) != 0 {
+		t.Error("topic should now be valid")
+	}
+
+	topic.Title = strings.Repeat("a", 256)
+	ok, errs = ValidateTopic(db, topic)
+	if ok || len(errs) != 1 {
+		t.Error("should not validate long title")
+	}
+
+	topic.Title = "Test"
+	topic.Description = strings.Repeat("a", 256)
+	ok, errs = ValidateTopic(db, topic)
+	if ok || len(errs) != 1 {
+		t.Error("should not validate long description")
+	}
+
 }
