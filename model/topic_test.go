@@ -208,4 +208,16 @@ func TestValidateTopic(t *testing.T) {
 		t.Error("should not validate long description")
 	}
 
+	topic.Description = ""
+	topic.Title = strings.Repeat("a", 255)
+	ok, errs = ValidateTopic(db, topic)
+	if !ok && len(errs) != 0 {
+		t.Error("255 title should be ok")
+	}
+
+	topic.Description = strings.Repeat("a", 255)
+	ok, errs = ValidateTopic(db, topic)
+	if !ok && len(errs) != 0 {
+		t.Error("255 description should be ok")
+	}
 }
