@@ -156,3 +156,26 @@ func TestHashPassword(t *testing.T) {
 		t.Error("password hash should now be set")
 	}
 }
+
+func TestCompareHashAndPassword(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := FindOneUserById(db, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(*mockUserTest(), user) {
+		t.Error("wrong user")
+	}
+
+	password := []byte("test")
+	if err := user.CompareHashAndPassword(&password); err != nil {
+		t.Errorf("wrong password: %s", err)
+	}
+
+}
