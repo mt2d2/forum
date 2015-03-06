@@ -120,3 +120,39 @@ func TestSaveUser(t *testing.T) {
 		t.Error("wrong user")
 	}
 }
+
+func TestHashPassword(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := FindOneUserById(db, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(*mockUserTest(), user) {
+		t.Error("wrong user")
+	}
+
+	if len(user.Password) != 0 {
+		t.Error("password not empty")
+	}
+
+	newPassword := []byte("asdf")
+	user.Password = newPassword
+	user.PasswordHash = []byte{}
+	user.HashPassword()
+
+	for _, v := range user.Password {
+		if v != 0 {
+			t.Error("password should be cleared")
+		}
+	}
+
+	if len(user.PasswordHash) <= 0 {
+		t.Error("password hash should now be set")
+	}
+}
