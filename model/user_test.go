@@ -178,4 +178,9 @@ func TestCompareHashAndPassword(t *testing.T) {
 		t.Errorf("wrong password: %s", err)
 	}
 
+	for _, v := range password {
+		if v != 0 {
+			t.Error("password should be cleared")
+		}
+	}
 }
