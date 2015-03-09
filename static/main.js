@@ -18,7 +18,7 @@ $(function() {
   var alertSuccess = $(".alert-success");
   window.setTimeout(function() {
     fadeOut(alertSuccess)
-  }, 4000);
+  }, 2000);
   $('button[class="close"]').on('click', function(e) {
     fadeOut(alertSuccess);
   });
