@@ -39,7 +39,7 @@ func TestFindOneForum(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(forum1, *mockForum1()) {
+	if !reflect.DeepEqual(*forum1, *mockForum1()) {
 		t.Error("forum does not equal mock forum")
 	}
 
@@ -48,7 +48,7 @@ func TestFindOneForum(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(forum2, *mockForum2()) {
+	if !reflect.DeepEqual(*forum2, *mockForum2()) {
 		t.Errorf("forum does not equal mock forum")
 	}
 }
