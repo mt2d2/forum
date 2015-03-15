@@ -42,6 +42,7 @@ func (app *app) handleForum(w http.ResponseWriter, req *http.Request) {
 	for i := 0; i < numberOfPages; i++ {
 		pageIndicies[i] = i + 1
 	}
+	currentPage := int(pageOffset + 1)
 
 	topics, err := model.FindTopics(app.db, id, limitTopics, pageOffset*limitTopics)
 	if err != nil {
@@ -50,12 +51,15 @@ func (app *app) handleForum(w http.ResponseWriter, req *http.Request) {
 	}
 
 	app.addBreadCrumb("/forum/"+strconv.Itoa(forum.Id), forum.Title)
+	if currentPage > 1 {
+		app.addBreadCrumb("forum/"+strconv.Itoa(forum.Id)+"/page/"+strconv.Itoa(currentPage), "page "+strconv.Itoa(currentPage))
+	}
 
 	results := make(map[string]interface{})
 	results["forum"] = forum
 	results["topics"] = topics
 	results["pageIndicies"] = pageIndicies
-	results["currentPage"] = int(pageOffset + 1)
+	results["currentPage"] = currentPage
 
 	app.renderTemplate(w, req, "forum", results)
 }
