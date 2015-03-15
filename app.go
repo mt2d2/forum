@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"reflect"
 	"regexp"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -28,6 +29,15 @@ func convertToMarkdown(markdown string) template.HTML {
 	return template.HTML(html)
 }
 
+func isLastElement(x int, list interface{}) bool {
+	val := reflect.ValueOf(list)
+	if val.Kind() == reflect.Ptr && !val.IsNil() {
+		val = val.Elem()
+	}
+
+	return x == val.Len()-1
+}
+
 type breadCrumb struct{ URL, Title string }
 
 type app struct {
@@ -43,7 +53,11 @@ func newApp() *app {
 		log.Panicln(err)
 	}
 
-	templates, err := template.New("").Funcs(template.FuncMap{"markDown": convertToMarkdown}).ParseFiles(
+	funcMap := template.FuncMap{
+		"markDown": convertToMarkdown,
+		"last":     isLastElement}
+
+	templates, err := template.New("").Funcs(funcMap).ParseFiles(
 		"templates/header.html",
 		"templates/footer.html",
 		"templates/index.html",
