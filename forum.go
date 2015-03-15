@@ -9,7 +9,7 @@ import (
 	"github.com/mt2d2/forum/model"
 )
 
-func numberOfForumPages(forum model.Forum) int {
+func numberOfForumPages(forum *model.Forum) int {
 	return int(math.Ceil(float64(forum.TopicCount) / float64(limitTopics)))
 }
 

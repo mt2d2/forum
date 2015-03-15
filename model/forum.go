@@ -15,7 +15,7 @@ type Forum struct {
 	PostCount  int
 }
 
-func FindOneForum(db *sql.DB, reqId string) (Forum, error) {
+func FindOneForum(db *sql.DB, reqId string) (*Forum, error) {
 	var (
 		id          int
 		title       string
@@ -25,15 +25,15 @@ func FindOneForum(db *sql.DB, reqId string) (Forum, error) {
 	row := db.QueryRow("SELECT * FROM forums WHERE id = ?", reqId)
 	err := row.Scan(&id, &title, &description)
 	if err != nil {
-		return Forum{}, errors.New("could not query for forum with id " + reqId)
+		return nil, errors.New("could not query for forum with id " + reqId)
 	}
 
 	topicCount, postCount, err := topicAndPostCount(db, reqId)
 	if err != nil {
-		return Forum{}, err
+		return nil, err
 	}
 
-	return Forum{id, title, description, topicCount, postCount}, nil
+	return &Forum{id, title, description, topicCount, postCount}, nil
 }
 
 func topicAndPostCount(db *sql.DB, reqId string) (int, int, error) {

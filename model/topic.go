@@ -76,7 +76,7 @@ func FindOneTopic(db *sql.DB, reqId string) (*Topic, error) {
 		return &Topic{}, err
 	}
 
-	return &Topic{id, title, description, forumId, postCount, &forum}, nil
+	return &Topic{id, title, description, forumId, postCount, forum}, nil
 }
 
 func postCount(db *sql.DB, reqId string) (int, error) {
