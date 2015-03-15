@@ -35,6 +35,7 @@ func (app *app) handleTopic(w http.ResponseWriter, req *http.Request) {
 	for i := 0; i < numberOfPages; i++ {
 		pageIndicies[i] = i + 1
 	}
+	currentPage := int(pageOffset + 1)
 
 	posts, err := model.FindPosts(app.db, id, limitPosts, pageOffset*limitPosts)
 	if err != nil {
@@ -44,12 +45,15 @@ func (app *app) handleTopic(w http.ResponseWriter, req *http.Request) {
 
 	app.addBreadCrumb("/forum/"+strconv.Itoa(topic.Forum.Id), topic.Forum.Title)
 	app.addBreadCrumb("/topic/"+strconv.Itoa(topic.Id), topic.Title)
+	if currentPage > 1 {
+		app.addBreadCrumb("/topic/"+strconv.Itoa(topic.Id)+"/page/"+strconv.Itoa(currentPage), "page "+strconv.Itoa(currentPage))
+	}
 
 	results := make(map[string]interface{})
 	results["topic"] = topic
 	results["posts"] = posts
 	results["pageIndicies"] = pageIndicies
-	results["currentPage"] = int(pageOffset + 1)
+	results["currentPage"] = currentPage
 
 	app.renderTemplate(w, req, "topic", results)
 }
