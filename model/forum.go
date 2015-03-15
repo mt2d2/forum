@@ -56,7 +56,7 @@ func topicAndPostCount(db *sql.DB, reqId string) (int, int, error) {
 	return topicCount, postCount, nil
 }
 
-func FindForums(db *sql.DB) ([]Forum, error) {
+func FindForums(db *sql.DB) (*[]Forum, error) {
 	rows, err := db.Query("SELECT * FROM forums")
 	defer rows.Close()
 	if err != nil {
@@ -84,5 +84,5 @@ func FindForums(db *sql.DB) ([]Forum, error) {
 		forums = append(forums, Forum{id, title, description, topicCount, postCount})
 	}
 
-	return forums, nil
+	return &forums, nil
 }
