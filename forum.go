@@ -9,6 +9,10 @@ import (
 	"github.com/mt2d2/forum/model"
 )
 
+func numberOfForumPages(forum model.Forum) int {
+	return int(math.Ceil(float64(forum.TopicCount) / float64(limitTopics)))
+}
+
 func (app *app) handleIndex(w http.ResponseWriter, req *http.Request) {
 	forums, err := model.FindForums(app.db)
 	if err != nil {
@@ -37,7 +41,7 @@ func (app *app) handleForum(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	numberOfPages := int(math.Ceil(float64(forum.TopicCount) / float64(limitTopics)))
+	numberOfPages := numberOfForumPages(forum)
 	pageIndicies := make([]int, numberOfPages)
 	for i := 0; i < numberOfPages; i++ {
 		pageIndicies[i] = i + 1
