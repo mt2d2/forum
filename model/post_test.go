@@ -4,6 +4,7 @@ import (
 	"math"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestEmptyPost(t *testing.T) {
@@ -55,5 +56,20 @@ func TestValidatePost(t *testing.T) {
 	ok, errs = ValidatePost(db, post)
 	if !ok || len(errs) != 0 {
 		t.Error("post should now validate")
+	}
+}
+
+func TestWhitespacePost(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	whitespace := "\t\n\t\n\t\n    \t\n\t\n\t\n"
+	post := &Post{1, whitespace, time.Now().UTC(), 1, 1, nil}
+	ok, errs := ValidatePost(db, post)
+	if ok || len(errs) != 1 {
+		t.Error("whitespace is only invalid item")
 	}
 }
