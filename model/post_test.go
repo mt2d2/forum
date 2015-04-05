@@ -73,3 +73,32 @@ func TestWhitespacePost(t *testing.T) {
 		t.Error("whitespace is only invalid item")
 	}
 }
+
+func TestFindOnePost(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	post, err := FindOnePost(db, "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if post.Id != 1 {
+		t.Error("wrong id")
+	}
+
+	if post.User == nil {
+		t.Error("no forum relation")
+	}
+
+	if post.TopicId != 1 {
+		t.Error("wrong forum")
+	}
+
+	if post.Text != "test" {
+		t.Error("wrong text")
+	}
+}
