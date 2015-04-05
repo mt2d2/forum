@@ -102,3 +102,37 @@ func TestFindOnePost(t *testing.T) {
 		t.Error("wrong text")
 	}
 }
+
+func TestFindPostsNoLimit(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	postsTopic1, err := FindPosts(db, "1", math.MaxUint32, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(postsTopic1) != 11 {
+		t.Error("wrong number of posts")
+	}
+}
+
+func TestFindPostsSmallLimit(t *testing.T) {
+	db, err := GetMockupDB()
+	defer db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	postsTopic1, err := FindPosts(db, "1", 5, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(postsTopic1) != 5 {
+		t.Error("wrong number of posts")
+	}
+}
