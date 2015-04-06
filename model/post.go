@@ -46,9 +46,9 @@ func SavePost(db *sql.DB, post *Post) error {
 	return err
 }
 
-func DeletePost(db *sql.DB, reqId int) (err error) {
-	_, err = db.Exec("delete from posts where id=?", reqId)
-	return
+func DeletePost(db *sql.DB, reqId int) error {
+	_, err := db.Exec("delete from posts where id=?", reqId)
+	return err
 }
 
 func FindOnePost(db *sql.DB, reqId string) (Post, error) {
