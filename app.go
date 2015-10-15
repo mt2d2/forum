@@ -2,12 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"reflect"
 	"regexp"
 
+	"github.com/GeertJohan/go.rice"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/gorilla/securecookie"
@@ -47,6 +49,14 @@ type app struct {
 	breadCrumbs []breadCrumb
 }
 
+func embedTemplate(box *rice.Box, tplName string) string {
+	tpl, err := box.String(tplName)
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("{{define \"%s\"}}%s{{end}}", tplName, tpl)
+}
+
 func newApp() *app {
 	db, err := sql.Open("sqlite3", *db)
 	if err != nil {
@@ -57,21 +67,17 @@ func newApp() *app {
 		"markDown": convertToMarkdown,
 		"last":     isLastElement}
 
-	templates, err := template.New("").Funcs(funcMap).ParseFiles(
-		"templates/header.html",
-		"templates/footer.html",
-		"templates/index.html",
-		"templates/forum.html",
-		"templates/topic.html",
-		"templates/addPost.html",
-		"templates/addTopic.html",
-		"templates/register.html",
-		"templates/login.html",
-	)
-
-	if err != nil {
-		panic(err)
-	}
+	templateBox := rice.MustFindBox("templates")
+	templates := template.New("").Funcs(funcMap)
+	templates.Parse(embedTemplate(templateBox, "header.html"))
+	templates.Parse(embedTemplate(templateBox, "footer.html"))
+	templates.Parse(embedTemplate(templateBox, "index.html"))
+	templates.Parse(embedTemplate(templateBox, "forum.html"))
+	templates.Parse(embedTemplate(templateBox, "topic.html"))
+	templates.Parse(embedTemplate(templateBox, "addPost.html"))
+	templates.Parse(embedTemplate(templateBox, "addTopic.html"))
+	templates.Parse(embedTemplate(templateBox, "register.html"))
+	templates.Parse(embedTemplate(templateBox, "login.html"))
 
 	sessionStore := sessions.NewCookieStore(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
@@ -130,6 +136,7 @@ func (app *app) renderTemplate(w http.ResponseWriter, r *http.Request, tmpl stri
 
 	session.Save(r, w)
 
+	w.Header().Set("Content-Type", "text/html")
 	err := app.templates.ExecuteTemplate(w, tmpl+".html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
