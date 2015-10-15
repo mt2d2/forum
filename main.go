@@ -9,30 +9,34 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/daaku/go.httpgzip"
 	"github.com/gorilla/mux"
 )
 
 const (
-	databaseFile = "forums.db"
-	limitPosts   = 10
-	limitTopics  = 10
+	limitPosts  = 10
+	limitTopics = 10
 )
 
+var listen = flag.String("listen", "localhost:8080", "host and port to listen on")
+var db = flag.String("db", "forum.db", "sqlite3 database file")
+
 func backup() error {
-	src, err := os.Open(databaseFile)
+	src, err := os.Open(*db)
 	defer src.Close()
 	if err != nil {
 		return errors.New("could not open database to backup")
 	}
 
-	err = os.MkdirAll("backup", 0755)
+	backupPath := path.Join(filepath.Dir(*db), "backup")
+	err = os.MkdirAll(backupPath, 0755)
 	if err != nil {
 		return errors.New("could not create backup")
 	}
 
-	destFile := path.Join("backup", databaseFile+".gz")
+	destFile := path.Join(backupPath, filepath.Base(*db)+".gz")
 	dest, err := os.Create(destFile)
 	defer dest.Close()
 	if err != nil {
@@ -47,8 +51,6 @@ func backup() error {
 
 	return gzipWriter.Close()
 }
-
-var listen = flag.String("listen", "localhost:8080", "host and port to listen on")
 
 func main() {
 	flag.Parse()

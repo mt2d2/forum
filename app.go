@@ -48,7 +48,7 @@ type app struct {
 }
 
 func newApp() *app {
-	db, err := sql.Open("sqlite3", databaseFile)
+	db, err := sql.Open("sqlite3", *db)
 	if err != nil {
 		log.Panicln(err)
 	}
