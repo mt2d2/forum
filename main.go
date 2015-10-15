@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/GeertJohan/go.rice"
 	"github.com/daaku/go.httpgzip"
 	"github.com/gorilla/mux"
 )
@@ -66,7 +67,8 @@ func main() {
 	log.Println("database opened")
 
 	r := mux.NewRouter()
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	staticBox := rice.MustFindBox("static").HTTPBox()
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticBox.HTTPBox())))
 
 	r.HandleFunc("/", app.handleIndex)
 
