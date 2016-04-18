@@ -14,6 +14,15 @@ func (app *app) handleAddPost(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
 
+	topic, err := model.FindOneTopic(app.db, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	app.addBreadCrumb("/forum/"+strconv.Itoa(topic.Forum.Id), topic.Forum.Title)
+	app.addBreadCrumb("/topic/"+strconv.Itoa(topic.Id), topic.Title)
+
 	results := make(map[string]interface{})
 	results["TopicId"] = id
 	app.renderTemplate(w, req, "addPost", results)

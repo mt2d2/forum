@@ -40,6 +40,7 @@ func (app *app) handleForum(w http.ResponseWriter, req *http.Request) {
 	forum, err := model.FindOneForum(app.db, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	numberOfPages := numberOfForumPages(forum)
@@ -76,6 +77,7 @@ func (app *app) handleAddTopic(w http.ResponseWriter, req *http.Request) {
 	forum, err := model.FindOneForum(app.db, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	app.addBreadCrumb("/forum/"+strconv.Itoa(forum.Id), forum.Title)
 
@@ -105,6 +107,7 @@ func (app *app) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
 	err = model.SaveTopic(app.db, topic)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	http.Redirect(w, req, "/forum/"+req.PostFormValue("ForumId"), http.StatusFound)
