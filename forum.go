@@ -73,6 +73,12 @@ func (app *app) handleAddTopic(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
 
+	forum, err := model.FindOneForum(app.db, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	app.addBreadCrumb("/forum/"+strconv.Itoa(forum.Id), forum.Title)
+
 	results := make(map[string]interface{})
 	results["ForumId"] = id
 	app.renderTemplate(w, req, "addTopic", results)
