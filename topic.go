@@ -68,6 +68,7 @@ func (app *app) handleAddTopic(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	app.addBreadCrumb("/forum/"+strconv.Itoa(forum.Id), forum.Title)
+	app.addBreadCrumb("/forum/"+strconv.Itoa(forum.Id)+"/add", "Add Topic")
 
 	results := make(map[string]interface{})
 	results["ForumId"] = id
