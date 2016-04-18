@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/Schema"
 	"github.com/gorilla/mux"
 	"github.com/mt2d2/forum/model"
 )
@@ -56,39 +55,4 @@ func (app *app) handleTopic(w http.ResponseWriter, req *http.Request) {
 	results["currentPage"] = currentPage
 
 	app.renderTemplate(w, req, "topic", results)
-}
-
-func (app *app) handleAddTopic(w http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id := vars["id"]
-
-	results := make(map[string]interface{})
-	results["ForumId"] = id
-	app.renderTemplate(w, req, "addTopic", results)
-}
-
-func (app *app) handleSaveTopic(w http.ResponseWriter, req *http.Request) {
-	req.ParseForm()
-
-	topic := model.NewTopic()
-	decoder := schema.NewDecoder()
-	err := decoder.Decode(topic, req.PostForm)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	ok, errors := model.ValidateTopic(app.db, topic)
-	if !ok {
-		app.addErrorFlashes(w, req, errors)
-		http.Redirect(w, req, "/forum/"+req.PostFormValue("ForumId")+"/add", http.StatusFound)
-		return
-	}
-
-	err = model.SaveTopic(app.db, topic)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	http.Redirect(w, req, "/forum/"+req.PostFormValue("ForumId"), http.StatusFound)
 }
